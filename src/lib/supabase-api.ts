@@ -2,7 +2,7 @@
  * Doctoringo AI — Supabase API Layer
  * Drop-in replacement for Django api.ts, backed by Supabase
  */
-import { supabase, edgeFunctionUrl } from './supabase';
+import { supabase } from './supabase';
 
 export class ApiError extends Error {
   status: number;
@@ -103,7 +103,6 @@ const localSessions: { id: string; title: string; created_at: string; updated_at
 const localMessages: Record<string, { id: string; role: string; content: string; created_at: string }[]> = {};
 
 const XAI_API_KEY = import.meta.env.VITE_XAI_API_KEY || '';
-const EDGE_FUNCTION_URL = edgeFunctionUrl('chat');
 
 // Medical system prompt
 const SYSTEM_PROMPT = `You are Doctoringo AI — a knowledgeable, empathetic medical health assistant created by Doctoringo.
@@ -194,10 +193,11 @@ export const chatApi = {
       created_at: new Date().toISOString(),
     });
 
-    // Build conversation history
+    // Build conversation history (last 10 turns for cost optimization)
+    const history = (localMessages[sessionId] || []).slice(-20);
     const messages = [
       { role: 'system' as const, content: SYSTEM_PROMPT },
-      ...(localMessages[sessionId] || []).map((m) => ({
+      ...history.map((m) => ({
         role: m.role as 'user' | 'assistant',
         content: m.content,
       })),
