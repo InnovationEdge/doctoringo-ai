@@ -215,7 +215,9 @@ export const chatApi = {
         model: 'grok-4-1-fast-reasoning',
         messages,
         stream: true,
-        temperature: 0.7,
+        temperature: 0.3,
+        reasoning_effort: 'medium',
+        max_tokens: 3000,
       }),
     });
 
