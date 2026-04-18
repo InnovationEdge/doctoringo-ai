@@ -212,7 +212,7 @@ export const chatApi = {
       },
       signal: params.signal,
       body: JSON.stringify({
-        model: 'grok-3',
+        model: 'grok-4-1-fast-reasoning',
         messages,
         stream: true,
         temperature: 0.7,
