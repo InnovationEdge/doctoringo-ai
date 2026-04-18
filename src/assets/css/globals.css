@@ -1,0 +1,1256 @@
+/* CSS Variables for theming - Light mode (Claude style) */
+:root {
+    --bg-primary: #faf9f5;
+    --bg-secondary: #f5f4f0;
+    --pill-bg: rgba(0, 0, 0, 0.05);
+    --pill-hover-bg: rgba(0, 0, 0, 0.08);
+    --dropdown-bg: rgba(255, 255, 255, 0.98);
+    --item-hover-bg: #f0f0f0;
+    --selected-bg: #f0f0f0;
+    --text-primary: #0d0d0d;
+    --text-secondary: #6b6b6b;
+    --text-tertiary: #9a9a9a;
+    --icon-color: #6b6b6b;
+    --border-color: #e5e5e5;
+    --border-hover: #d0d0d0;
+    --dropdown-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+    --accent-color: #3b82f6;
+
+    /* Chat specific */
+    --chat-user-bubble-bg: #f0f0f0;
+    --chat-input-bg: #f8f8f8;
+    --chat-input-ring: #e5e5e5;
+    --chat-input-ring-focus: #d0d0d0;
+
+    /* Global component sizes */
+    --icon-size-sm: 16px;
+    --icon-size-md: 20px;
+    --icon-size-lg: 24px;
+    --btn-height-sm: 36px;
+    --btn-height-md: 44px;
+    --btn-height-lg: 52px;
+    --border-radius-sm: 8px;
+    --border-radius-md: 12px;
+    --border-radius-lg: 16px;
+    --border-radius-xl: 24px;
+    --border-radius-2xl: 32px;
+    --border-radius-full: 9999px;
+}
+
+/* Dark mode variables (Grok style) */
+[data-theme='dark'] {
+    --bg-primary: #141414;
+    --bg-secondary: #212121;
+    --pill-bg: rgba(255, 255, 255, 0.08);
+    --pill-hover-bg: rgba(255, 255, 255, 0.12);
+    --dropdown-bg: rgba(33, 33, 33, 0.98);
+    --item-hover-bg: #2a2a2a;
+    --selected-bg: #2a2a2a;
+    --text-primary: #ffffff;
+    --text-secondary: #9a9a9a;
+    --text-tertiary: #6b6b6b;
+    --icon-color: #9a9a9a;
+    --border-color: #2a2a2a;
+    --border-hover: #3a3a3a;
+    --dropdown-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.4);
+    --accent-color: #60a5fa;
+
+    /* Chat specific */
+    --chat-user-bubble-bg: #1a1a1a;
+    --chat-input-bg: #212121;
+    --chat-input-ring: #2a2a2a;
+    --chat-input-ring-focus: #3a3a3a;
+}
+
+/* ========================================
+   GLOBAL REUSABLE COMPONENTS - Grok Style
+   ======================================== */
+
+/* === Back Button - Universal === */
+.g-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-primary);
+    background: transparent;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.g-back-btn:hover {
+    background-color: var(--item-hover-bg);
+}
+
+.g-back-btn svg {
+    width: var(--icon-size-md);
+    height: var(--icon-size-md);
+    flex-shrink: 0;
+}
+
+/* === Primary Button - Universal === */
+.g-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: var(--btn-height-lg);
+    padding: 0 28px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--bg-primary);
+    background-color: var(--text-primary);
+    border: none;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+}
+
+.g-btn-primary:hover:not(:disabled) {
+    opacity: 0.85;
+}
+
+.g-btn-primary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* === Secondary Button - Universal === */
+.g-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: var(--btn-height-md);
+    padding: 0 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.g-btn-secondary:hover {
+    border-color: var(--text-primary);
+    background-color: var(--item-hover-bg);
+}
+
+/* === Pill Button - Universal === */
+.g-btn-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: var(--btn-height-md);
+    padding: 0 24px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--bg-primary);
+    background-color: var(--text-primary);
+    border: none;
+    border-radius: var(--border-radius-full);
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+}
+
+.g-btn-pill:hover:not(:disabled) {
+    opacity: 0.85;
+}
+
+/* === Input Field - Universal === */
+.g-input {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 15px;
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
+    border: 2px solid var(--g-input-border);
+    border-radius: var(--border-radius-md);
+    transition: border-color 0.15s ease;
+}
+
+.g-input::placeholder {
+    color: var(--g-input-placeholder);
+}
+
+.g-input:focus {
+    outline: none;
+    border-color: var(--text-primary);
+}
+
+/* === Textarea - Universal === */
+.g-textarea {
+    width: 100%;
+    padding: 16px;
+    font-size: 15px;
+    font-family: inherit;
+    line-height: 1.6;
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
+    border: 2px solid var(--g-input-border);
+    border-radius: var(--border-radius-md);
+    resize: vertical;
+    min-height: 160px;
+    transition: border-color 0.15s ease;
+}
+
+.g-textarea::placeholder {
+    color: var(--g-input-placeholder);
+}
+
+.g-textarea:focus {
+    outline: none;
+    border-color: var(--text-primary);
+}
+
+/* Input theme variables */
+:root {
+    --g-input-border: rgba(0, 0, 0, 0.2);
+    --g-input-placeholder: rgba(0, 0, 0, 0.4);
+}
+
+[data-theme='dark'] {
+    --g-input-border: rgba(255, 255, 255, 0.25);
+    --g-input-placeholder: rgba(255, 255, 255, 0.4);
+}
+
+/* === Card - Universal === */
+.g-card {
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    padding: 24px;
+    transition: border-color 0.15s ease;
+}
+
+.g-card:hover {
+    border-color: var(--text-primary);
+}
+
+/* === Label - Universal === */
+.g-label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* === Hint Text - Universal === */
+.g-hint {
+    margin: 0 0 14px 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+* {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Prevent page-level scrolling - only content areas should scroll */
+html, body {
+    height: 100vh;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+}
+
+#root {
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Spin animation for loading indicators */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Fade in animation for modals and dropdowns */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* Slide up animation for toasts */
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Slide up animation for notifications */
+@keyframes slide-up {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.2s ease-out;
+}
+
+.animate-slide-up {
+    animation: slide-up 0.3s ease-out;
+}
+
+/* Custom notification styling */
+.ant-notification {
+    z-index: 1050 !important;
+}
+
+.ant-notification-notice {
+    border-radius: 12px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+    padding: 14px 16px !important;
+    background-color: var(--dropdown-bg) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.ant-notification-notice-message {
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    margin-bottom: 4px !important;
+    color: var(--text-primary) !important;
+}
+
+.ant-notification-notice-description {
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+    color: var(--text-secondary) !important;
+}
+
+/* Error notification styling */
+.ant-notification-notice-error .ant-notification-notice-icon {
+    color: #ef4444 !important;
+}
+
+/* Warning notification styling */
+.ant-notification-notice-warning .ant-notification-notice-icon {
+    color: #f59e0b !important;
+}
+
+/* Info notification styling */
+.ant-notification-notice-info .ant-notification-notice-icon {
+    color: #3b82f6 !important;
+}
+
+/* Close button */
+.ant-notification-notice-close {
+    color: var(--text-secondary) !important;
+    top: 14px !important;
+    right: 14px !important;
+}
+
+.ant-notification-notice-close:hover {
+    color: var(--text-primary) !important;
+}
+
+.custom-notification-info .ant-notification-notice-message,
+.custom-notification-info .ant-notification-notice-description {
+    color: #fff !important;
+}
+
+/* Fix white border on custom gradient notifications */
+.custom-notification-info .ant-notification-notice {
+    border: none !important;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.custom-notification-info .ant-notification-notice-wrapper {
+    border: none !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Badge color transition for smooth model switch */
+.ant-badge-count {
+    transition: background-color 0.3s ease !important;
+}
+
+
+.custom-notification-info .ant-notification-notice-close {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.custom-notification-info .ant-notification-notice-close:hover {
+    color: #fff !important;
+}
+
+/* Performance-optimized hover effects using CSS instead of JS */
+.hover-option-light {
+    transition: background-color 0.2s ease;
+}
+.hover-option-light:hover {
+    background-color: #f5f5f5 !important;
+}
+.hover-option-light.selected {
+    background-color: #f0f0f0 !important;
+}
+
+.hover-option-dark {
+    transition: background-color 0.2s ease;
+}
+.hover-option-dark:hover {
+    background-color: #3a3a3a !important;
+}
+.hover-option-dark.selected {
+    background-color: #3a3a3a !important;
+}
+
+/* Sidebar button hover effects */
+.sidebar-btn-light {
+    transition: background-color 0.2s ease;
+}
+.sidebar-btn-light:hover {
+    background-color: #f0f0f0 !important;
+}
+
+.sidebar-btn-dark {
+    transition: background-color 0.2s ease;
+}
+.sidebar-btn-dark:hover {
+    background-color: #3a3a3a !important;
+}
+
+/* Remove all focus outlines and borders from sidebar buttons */
+aside button,
+aside button:focus,
+aside button:focus-visible,
+aside button:active,
+.chat-history-container button,
+.chat-history-container button:focus,
+.chat-history-container button:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+}
+
+/* Remove focus ring from all interactive elements in sidebar */
+aside *:focus,
+aside *:focus-visible {
+    outline: none !important;
+}
+
+/* Chat history item hover */
+.chat-history-item {
+    transition: background-color 0.15s ease;
+}
+.chat-history-item:hover .chat-menu-btn {
+    opacity: 1 !important;
+}
+
+/* Upgrade button hover */
+.upgrade-btn-hover {
+    background: linear-gradient(135deg, rgba(250,173,20,0.1) 0%, rgba(250,173,20,0.05) 100%);
+    transition: all 0.2s ease;
+}
+.upgrade-btn-hover:hover {
+    background: linear-gradient(135deg, rgba(250,173,20,0.15) 0%, rgba(250,173,20,0.08) 100%) !important;
+}
+
+/* Country selector button hover */
+.country-btn-light {
+    transition: all 0.15s ease;
+}
+.country-btn-light:hover {
+    background-color: #f5f5f5 !important;
+    color: #262626 !important;
+}
+
+.country-btn-dark {
+    transition: all 0.15s ease;
+}
+.country-btn-dark:hover {
+    background-color: #1a1a1a !important;
+    color: #d0d0d0 !important;
+}
+
+/* Back button hover - text button style */
+.back-btn-light {
+    transition: all 0.15s ease;
+}
+.back-btn-light:hover {
+    background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+.back-btn-dark {
+    transition: all 0.15s ease;
+}
+.back-btn-dark:hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Plan toggle button hover (inactive state) */
+.plan-toggle-btn-light {
+    transition: all 0.2s ease;
+}
+.plan-toggle-btn-light:hover:not(.active) {
+    background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+.plan-toggle-btn-dark {
+    transition: all 0.2s ease;
+}
+.plan-toggle-btn-dark:hover:not(.active) {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Google sign-in button hover */
+.google-btn-light {
+    transition: all 0.2s ease;
+}
+.google-btn-light:hover {
+    background-color: #f5f5f5 !important;
+    border-color: #d0d0d0 !important;
+}
+
+.google-btn-dark {
+    transition: all 0.2s ease;
+}
+.google-btn-dark:hover {
+    background-color: #252525 !important;
+    border-color: #3f3f3f !important;
+}
+
+/* ========================================
+   MOBILE-SPECIFIC STYLES (ChatGPT-like UX)
+   ======================================== */
+
+/* Mobile Drawer - Smooth slide animation */
+.mobile-drawer-root .ant-drawer-content-wrapper {
+    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1) !important;
+}
+
+.mobile-drawer-root .ant-drawer-mask {
+    transition: opacity 0.3s ease !important;
+}
+
+.mobile-drawer .ant-drawer-header {
+    padding: 16px 20px !important;
+    min-height: 64px;
+}
+
+.mobile-drawer .ant-drawer-header-title {
+    flex-direction: row-reverse;
+}
+
+.mobile-drawer .ant-drawer-close {
+    margin-right: 0;
+    margin-left: auto;
+    padding: 8px;
+    color: inherit;
+}
+
+/* Improve touch targets on mobile */
+@media (max-width: 768px) {
+    /* Larger touch targets */
+    .ant-btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    /* Prevent text selection during swipe */
+    .chat-container {
+        -webkit-user-select: none;
+        user-select: none;
+        touch-action: pan-y pinch-zoom;
+    }
+
+    /* Allow text selection in messages */
+    .chat-messages-container {
+        -webkit-user-select: text;
+        user-select: text;
+    }
+
+    /* Smooth scrolling for mobile */
+    .custom-scrollbar {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+
+    /* Mobile header improvements */
+    .main-header {
+        padding: 0 12px !important;
+        height: 56px !important;
+        min-height: 56px !important;
+    }
+
+    /* Mobile input improvements */
+    .ant-input-textarea textarea {
+        font-size: 16px !important; /* Prevents iOS zoom on focus */
+    }
+
+    /* Notification positioning for mobile */
+    .ant-notification {
+        top: 8px !important;
+        right: 8px !important;
+        left: 8px !important;
+        width: auto !important;
+    }
+
+    .ant-notification-notice {
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    /* Mobile dropdown improvements */
+    .ant-dropdown {
+        max-width: calc(100vw - 32px) !important;
+    }
+
+    /* Mobile model selector */
+    .ant-dropdown-menu {
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+}
+
+/* Tablet adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .main-header {
+        padding: 0 16px !important;
+    }
+}
+
+/* Safe area insets for iPhone X and newer */
+@supports (padding: max(0px)) {
+    @media (max-width: 768px) {
+        .chat-container {
+            padding-bottom: max(env(safe-area-inset-bottom), 16px);
+        }
+
+        .mobile-drawer .ant-drawer-body {
+            padding-bottom: max(env(safe-area-inset-bottom), 16px);
+        }
+    }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    .mobile-drawer-root .ant-drawer-content-wrapper,
+    .mobile-drawer-root .ant-drawer-mask,
+    * {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+}
+
+/* Active state for touch devices */
+@media (hover: none) and (pointer: coarse) {
+    .hover-option-light:active,
+    .hover-option-dark:active {
+        transform: scale(0.98);
+    }
+
+    .sidebar-btn-light:active,
+    .sidebar-btn-dark:active {
+        opacity: 0.7;
+    }
+}
+
+/* ========================================
+   PERFORMANCE OPTIMIZATIONS (ChatGPT-like UX)
+   ======================================== */
+
+/* Cursor blink animation for streaming indicator */
+@keyframes cursorBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* Typing dots animation */
+.typing-dots {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.typing-dots .dot {
+    display: inline-block;
+    font-size: 24px;
+    line-height: 1;
+    animation: dotPulse 1.4s infinite ease-in-out;
+}
+
+.typing-dots .dot:nth-child(1) { animation-delay: 0s; }
+.typing-dots .dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots .dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dotPulse {
+    0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+    40% { opacity: 1; transform: scale(1); }
+}
+
+/* Message slide-in animation */
+@keyframes messageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.chat-message-item {
+    animation: messageSlideIn 0.15s ease-out;
+    will-change: auto; /* Disable will-change to reduce GPU memory usage */
+}
+
+/* Disable animation during streaming to prevent flickering */
+.chat-message-item.streaming {
+    animation: none;
+}
+
+/* Scroll optimizations for chat area */
+.chat-messages-wrapper {
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Smooth scrollbar appearance */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(128, 128, 128, 0.3);
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(128, 128, 128, 0.5);
+}
+
+/* Send button smooth animation */
+.chat-send-btn {
+    transition: transform 0.1s ease, background-color 0.15s ease;
+}
+
+.chat-send-btn:active {
+    transform: scale(0.92);
+}
+
+/* Chat history item micro-interactions */
+.chat-history-list .ant-list-item {
+    transition: transform 0.1s ease, background-color 0.15s ease !important;
+}
+
+.chat-history-list .ant-list-item:active {
+    transform: scale(0.98);
+}
+
+/* Smooth focus effect for inputs */
+.ant-input:focus,
+.ant-input-textarea textarea:focus {
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+/* Button hover lift effect */
+.ant-btn {
+    transition: transform 0.1s ease, box-shadow 0.15s ease, background-color 0.15s ease !important;
+}
+
+.ant-btn:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+/* Dropdown menu smooth appearance */
+.ant-dropdown {
+    animation: dropdownFadeIn 0.15s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Modal smooth appearance */
+.ant-modal {
+    animation: modalSlideIn 0.2s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Tooltip smooth appearance */
+.ant-tooltip {
+    animation: tooltipFadeIn 0.15s ease-out;
+}
+
+@keyframes tooltipFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(2px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Notification slide-in animation */
+.ant-notification-notice {
+    animation: notificationSlideIn 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes notificationSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* ========================================
+   CHATGPT-LIKE UX ENHANCEMENTS
+   ======================================== */
+
+/* Smooth theme transition for all elements */
+body,
+.ant-layout,
+.ant-layout-sider,
+.ant-layout-header,
+.ant-layout-content,
+.chat-container,
+.main-header {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Input container focus glow effect (ChatGPT style) */
+.chat-input-container {
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.chat-input-container:focus-within {
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.15);
+}
+
+/* Suggested prompts hover effects */
+.suggested-prompt-btn {
+    transition: all 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+    transform: translateY(0);
+}
+
+.suggested-prompt-btn:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.suggested-prompt-btn:active {
+    transform: none;
+}
+
+/* Copy button success animation */
+@keyframes copySuccess {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.copy-success-icon {
+    animation: copySuccess 0.3s ease-out;
+    color: #52c41a !important;
+}
+
+/* Avatar pulse effect for AI responses */
+@keyframes avatarPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.ai-avatar-loading {
+    animation: avatarPulse 1.5s ease-in-out infinite;
+}
+
+/* Smooth list item appearance */
+@keyframes listItemAppear {
+    from {
+        opacity: 0;
+        transform: translateX(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.chat-history-list .ant-list-item {
+    animation: listItemAppear 0.2s ease-out;
+}
+
+/* Skeleton loading shimmer effect */
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.loading-shimmer {
+    background: linear-gradient(90deg,
+        rgba(128, 128, 128, 0.1) 25%,
+        rgba(128, 128, 128, 0.2) 50%,
+        rgba(128, 128, 128, 0.1) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+/* Scroll to bottom button pulse */
+@keyframes scrollBtnPulse {
+    0%, 100% { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); }
+    50% { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25); }
+}
+
+.scroll-to-bottom-btn {
+    animation: none;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.scroll-to-bottom-btn:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* File upload button hover effect - Grok style */
+.file-upload-btn {
+    transition: opacity 0.15s ease;
+}
+
+.file-upload-btn:hover {
+    transform: none;
+    opacity: 0.7;
+}
+
+.file-upload-btn:active {
+    transform: none;
+}
+
+/* Model selector dropdown hover */
+.model-selector-btn {
+    transition: all 0.15s ease;
+}
+
+.model-selector-btn:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+/* Dark mode model selector hover */
+.dark .model-selector-btn:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Smooth card hover effect */
+.hover-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Link hover underline animation */
+.animated-link {
+    position: relative;
+    text-decoration: none;
+}
+
+.animated-link::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background-color: currentColor;
+    transition: width 0.2s ease;
+}
+
+.animated-link:hover::after {
+    width: 100%;
+}
+
+/* Ripple effect for buttons */
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+.btn-ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-ripple::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.3) 10%, transparent 10%);
+    background-repeat: no-repeat;
+    background-position: 50%;
+    transform: scale(10);
+    opacity: 0;
+    transition: transform 0.5s, opacity 0.5s;
+}
+
+.btn-ripple:active::after {
+    transform: scale(0);
+    opacity: 1;
+    transition: 0s;
+}
+
+/* Smooth checkbox/switch toggle */
+.ant-switch {
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ant-switch:focus {
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+/* Menu item hover effect */
+.ant-dropdown-menu-item {
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+/* Sidebar collapse animation improvement */
+.ant-layout-sider {
+    transition: width 0.2s cubic-bezier(0.32, 0.72, 0, 1),
+                min-width 0.2s cubic-bezier(0.32, 0.72, 0, 1),
+                max-width 0.2s cubic-bezier(0.32, 0.72, 0, 1) !important;
+}
+
+/* Page transition fade */
+@keyframes pageFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.page-container {
+    animation: pageFadeIn 0.3s ease-out;
+}
+
+/* Empty state bounce animation */
+@keyframes emptyStateBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+.empty-state-icon {
+    animation: emptyStateBounce 2s ease-in-out infinite;
+}
+
+/* Success checkmark animation */
+@keyframes checkmarkDraw {
+    0% { stroke-dashoffset: 50; }
+    100% { stroke-dashoffset: 0; }
+}
+
+.success-checkmark {
+    stroke-dasharray: 50;
+    stroke-dashoffset: 50;
+    animation: checkmarkDraw 0.3s ease-out forwards;
+}
+
+/* Error shake animation */
+@keyframes errorShake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-4px); }
+    40%, 80% { transform: translateX(4px); }
+}
+
+.error-shake {
+    animation: errorShake 0.4s ease-out;
+}
+
+/* Loading spinner smooth rotation */
+.loading-spinner {
+    animation: spin 1s linear infinite;
+}
+
+/* Floating action button */
+.fab-btn {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fab-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.fab-btn:active {
+    transform: scale(0.95);
+}
+
+/* ========================================
+   MOBILE RESPONSIVENESS ENHANCEMENTS
+   ======================================== */
+
+/* Fix dropdown overflow on mobile */
+@media (max-width: 400px) {
+    .model-selector-dropdown,
+    .country-selector-dropdown {
+        min-width: calc(100vw - 32px) !important;
+        max-width: calc(100vw - 32px) !important;
+        left: 16px !important;
+        right: 16px !important;
+    }
+}
+
+/* Improved touch targets for mobile (48px minimum) */
+@media (max-width: 768px) {
+    .mobile-touch-target {
+        min-height: 48px !important;
+        min-width: 48px !important;
+    }
+
+    /* File upload and attachment buttons */
+    .file-upload-btn,
+    .attachment-btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    /* Model selector button on mobile */
+    .model-selector-btn {
+        min-height: 40px;
+        padding: 8px 12px !important;
+    }
+
+    /* Suggested prompts on mobile */
+    .suggested-prompt-btn {
+        min-height: 44px;
+        padding: 10px 16px !important;
+    }
+
+    /* Send button on mobile */
+    .chat-send-btn {
+        min-width: 40px !important;
+        min-height: 40px !important;
+    }
+}
+
+/* Safe area padding for input on mobile with virtual keyboard */
+@media (max-width: 768px) {
+    .chat-input-area {
+        padding-bottom: max(16px, env(safe-area-inset-bottom));
+    }
+
+    /* Ensure input doesn't get hidden behind keyboard */
+    .chat-input-container {
+        margin-bottom: env(safe-area-inset-bottom, 0px);
+    }
+}
+
+/* Language toggle mobile styling */
+.language-toggle {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.language-toggle:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+.dark .language-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Country selector responsive */
+@media (max-width: 480px) {
+    .country-selector-content {
+        min-width: calc(100vw - 48px) !important;
+    }
+}
+
+/* Responsive CTA buttons */
+.cta-primary {
+    min-height: 52px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 26px;
+    transition: all 0.2s ease;
+}
+
+.cta-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.cta-primary:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Responsive plan cards */
+@media (max-width: 640px) {
+    .plan-card {
+        padding: 20px !important;
+    }
+
+    .plan-card-title {
+        font-size: 20px !important;
+    }
+
+    .plan-card-price {
+        font-size: 28px !important;
+    }
+}
+
+/* Responsive modal on mobile */
+@media (max-width: 480px) {
+    .ant-modal {
+        max-width: calc(100vw - 32px) !important;
+        margin: 16px !important;
+    }
+
+    .ant-modal-content {
+        border-radius: 16px !important;
+    }
+}

@@ -1,0 +1,496 @@
+/* Billing Page Styles */
+
+/* Container */
+.billing-page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 32px 20px;
+}
+
+.billing-page.loading {
+    max-width: 900px;
+    padding: 24px 16px;
+}
+
+/* Header */
+.billing-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.billing-header h2 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 24px;
+}
+
+[data-theme='light'] .billing-header h2 {
+    color: #0d0d0d;
+}
+
+[data-theme='dark'] .billing-header h2 {
+    color: #ffffff;
+}
+
+.billing-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    font-weight: 500;
+    font-size: 15px;
+    background: transparent;
+    border: none;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+[data-theme='light'] .billing-back-btn {
+    color: #0d0d0d;
+}
+
+[data-theme='dark'] .billing-back-btn {
+    color: #ffffff;
+}
+
+[data-theme='light'] .billing-back-btn:hover {
+    background-color: #f0f0f0;
+}
+
+[data-theme='dark'] .billing-back-btn:hover {
+    background-color: #1a1a1a;
+}
+
+/* Card - Grok style */
+.billing-card {
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 28px;
+    box-shadow: none;
+}
+
+[data-theme='light'] .billing-card {
+    background-color: #ffffff;
+    border: 1px solid #e5e5e5;
+}
+
+[data-theme='dark'] .billing-card {
+    background-color: #141414;
+    border: 1px solid #2a2a2a;
+}
+
+/* Plan Section */
+.billing-plan-label {
+    font-size: 14px;
+    display: block;
+    margin-bottom: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.billing-plan-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.billing-plan-title {
+    margin: 0;
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 20px;
+}
+
+.billing-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-weight: 500;
+    font-size: 12px;
+}
+
+.billing-status-badge.active {
+    background-color: rgba(82, 196, 26, 0.15);
+    color: #52c41a;
+    border: 1px solid rgba(82, 196, 26, 0.3);
+}
+
+[data-theme='light'] .billing-status-badge.active {
+    background-color: #f6ffed;
+    border-color: #b7eb8f;
+}
+
+.billing-price {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.billing-price-amount {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.5px;
+}
+
+.billing-price-period {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+/* Info Box */
+.billing-info-box {
+    padding: 16px;
+    background-color: var(--page-bg, #f7f7f8);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 20px;
+}
+
+.billing-info-label {
+    font-size: 14px;
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.billing-info-value {
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--text-primary);
+}
+
+/* Divider */
+.billing-divider {
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 16px 0;
+}
+
+/* Payment Method */
+.billing-section-label {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+}
+
+.billing-payment-method {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.billing-payment-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--item-hover-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+}
+
+.billing-payment-info {
+    flex: 1;
+}
+
+.billing-payment-name {
+    display: block;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.billing-payment-brand {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+/* Info Alert */
+.billing-info-alert {
+    padding: 16px;
+    background-color: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+[data-theme='light'] .billing-info-alert {
+    background-color: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.billing-info-alert-icon {
+    color: #3b82f6;
+    flex-shrink: 0;
+}
+
+.billing-info-alert-title {
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.billing-info-alert-text {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+/* No payment method notice */
+.billing-no-payment {
+    padding: 12px 16px;
+    background-color: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-primary);
+}
+
+[data-theme='light'] .billing-no-payment {
+    background-color: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+/* Auto Renewal */
+.billing-auto-renewal {
+    margin-bottom: 16px;
+}
+
+.billing-auto-renewal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.billing-auto-renewal-title {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.billing-auto-renewal-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+/* Remove button */
+.billing-remove-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    background-color: transparent;
+    color: #ef4444;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.billing-remove-btn:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* Action Button - Grok style */
+.billing-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 24px;
+    border-radius: 9999px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+}
+
+.billing-action-btn.primary {
+    border: none;
+}
+
+[data-theme='light'] .billing-action-btn.primary {
+    background-color: #0d0d0d;
+    color: #ffffff;
+}
+
+[data-theme='dark'] .billing-action-btn.primary {
+    background-color: #ffffff;
+    color: #0d0d0d;
+}
+
+.billing-action-btn.primary:hover {
+    opacity: 0.85;
+}
+
+.billing-action-btn.danger {
+    background-color: transparent;
+    color: #ef4444;
+}
+
+[data-theme='light'] .billing-action-btn.danger {
+    border: 1px solid #e5e5e5;
+}
+
+[data-theme='dark'] .billing-action-btn.danger {
+    border: 1px solid #2a2a2a;
+}
+
+.billing-action-btn.danger:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+    border-color: #ef4444;
+}
+
+/* Payment History */
+.billing-history-title {
+    margin: 0 0 16px;
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.billing-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.billing-table th {
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: 13px;
+}
+
+.billing-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.billing-table td.amount {
+    font-weight: 600;
+}
+
+/* Payment method in table */
+.billing-table-payment {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Status Tags */
+.billing-status-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.billing-status-tag.success {
+    background-color: rgba(82, 196, 26, 0.15);
+    color: #52c41a;
+    border: 1px solid rgba(82, 196, 26, 0.3);
+}
+
+[data-theme='light'] .billing-status-tag.success {
+    background-color: #f6ffed;
+    border-color: #b7eb8f;
+}
+
+.billing-status-tag.pending {
+    background-color: rgba(59, 130, 246, 0.15);
+    color: #1890ff;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+[data-theme='light'] .billing-status-tag.pending {
+    background-color: #e6f7ff;
+    border-color: #91d5ff;
+}
+
+.billing-status-tag.failed {
+    background-color: rgba(255, 77, 79, 0.15);
+    color: #ff4d4f;
+    border: 1px solid rgba(255, 77, 79, 0.3);
+}
+
+[data-theme='light'] .billing-status-tag.failed {
+    background-color: #fff2f0;
+    border-color: #ffccc7;
+}
+
+/* Empty state */
+.billing-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+}
+
+/* Total count */
+.billing-total {
+    margin-top: 16px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+/* ========== Payment History Page Styles ========== */
+
+/* Payment history container */
+.payment-history-page {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.payment-history-title {
+    margin-bottom: 24px;
+    color: var(--text-primary);
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* Type tag - one-time / auto-renewal */
+.billing-status-tag.renewal {
+    background-color: rgba(59, 130, 246, 0.15);
+    color: #1890ff;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+[data-theme='light'] .billing-status-tag.renewal {
+    background-color: #e6f7ff;
+    border-color: #91d5ff;
+}
+
+.billing-status-tag.one-time {
+    background-color: var(--selected-bg);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.billing-status-tag.cancelled {
+    background-color: var(--selected-bg);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}

@@ -1,0 +1,97 @@
+/* ========== File Upload Button Styles ========== */
+
+/* Container */
+.file-upload-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Hidden input */
+.file-upload-input {
+    display: none;
+}
+
+/* Upload button */
+.file-upload-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    color: var(--file-upload-btn-color);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.file-upload-btn:hover {
+    background-color: var(--item-hover-bg);
+}
+
+.file-upload-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+[data-theme='light'] {
+    --file-upload-btn-color: rgba(0, 0, 0, 0.65);
+}
+
+[data-theme='dark'] {
+    --file-upload-btn-color: rgba(255, 255, 255, 0.65);
+}
+
+/* Selected file badge */
+.file-upload-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 10px;
+    background-color: var(--file-badge-bg);
+    border: 1px solid var(--file-badge-border);
+    font-size: 13px;
+    max-width: 200px;
+}
+
+.file-upload-badge-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    color: var(--text-primary);
+}
+
+.file-upload-remove-btn {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    transition: background-color 0.15s ease;
+}
+
+.file-upload-remove-btn:hover {
+    background-color: var(--item-hover-bg);
+}
+
+[data-theme='light'] {
+    --file-badge-bg: rgba(13, 13, 13, 0.06);
+    --file-badge-border: rgba(13, 13, 13, 0.15);
+    --file-icon-color: #1a73e8;
+    --file-remove-color: rgba(0, 0, 0, 0.45);
+}
+
+[data-theme='dark'] {
+    --file-badge-bg: rgba(236, 236, 236, 0.1);
+    --file-badge-border: rgba(236, 236, 236, 0.2);
+    --file-icon-color: #69b1ff;
+    --file-remove-color: rgba(255, 255, 255, 0.45);
+}

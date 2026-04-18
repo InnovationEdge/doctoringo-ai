@@ -1,0 +1,19 @@
+/* iOS-style border radius for buttons */
+.border-radius-35 {
+    border-radius: 13px !important;
+}
+
+/* iOS-style border radius for cards */
+.rounded-2xl {
+    border-radius: 16px !important;
+}
+
+.border-radius-left-35 {
+    border-top-left-radius: 30px !important;
+    border-bottom-left-radius: 30px !important;
+}
+
+.border-radius-right-35 {
+    border-top-right-radius: 30px !important;
+    border-bottom-right-radius: 30px !important;
+}

@@ -1,0 +1,75 @@
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* iOS-style send button */
+.chat-button-send {
+    right: 12px !important;
+    bottom: 50% !important;
+    transform: translateY(50%) !important;
+    border-radius: 50% !important;
+    position: absolute !important;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 58, 128, 0.25);
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* iOS-style hover: subtle scale and enhanced shadow */
+.chat-button-send:hover:not(:disabled) {
+    transform: translateY(50%) scale(1.05) !important;
+    box-shadow: 0 4px 16px rgba(0, 58, 128, 0.4);
+}
+
+/* iOS-style active: press feedback */
+.chat-button-send:active:not(:disabled) {
+    transform: translateY(50%) scale(0.95) !important;
+    box-shadow: 0 2px 6px rgba(0, 58, 128, 0.3);
+}
+
+/* Primary button overrides for dark mode */
+[data-theme='dark'] .ant-btn-primary {
+    background-color: #ffffff !important;
+    border-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+[data-theme='dark'] .ant-btn-primary:hover:not(:disabled) {
+    background-color: #f0f0f0 !important;
+    border-color: #f0f0f0 !important;
+    color: #000000 !important;
+}
+
+[data-theme='dark'] .ant-btn-primary.primary-blue-button-color span {
+    color: #000000 !important;
+}
+
+/* Sidebar Navigation Buttons */
+.sidebar-nav-button {
+  box-shadow: none !important;
+  border: 1px solid transparent;
+}
+
+.sidebar-nav-button:not(.active):hover {
+  background-color: rgba(0, 58, 128, 0.08) !important;
+  border-color: rgba(0, 58, 128, 0.2) !important;
+}
+
+.sidebar-nav-button.active {
+  background-color: #033C81 !important;
+  border-color: #033C81 !important;
+  color: white !important;
+  box-shadow: 0 2px 8px rgba(0, 58, 128, 0.3) !important;
+}
+
+.sidebar-nav-button.active:hover {
+  background-color: #004a99 !important;
+  border-color: #004a99 !important;
+}
+
+.sidebar-nav-button .anticon {
+  color: inherit;
+}

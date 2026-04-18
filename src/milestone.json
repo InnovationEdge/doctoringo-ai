@@ -1,0 +1,7 @@
+{
+  "milestone_name": "Safe Version",
+  "timestamp": "2026-01-29T20:50:00Z",
+  "version": "1.2.0",
+  "description": "Baseline version with KnowHow AI branding, Light/Dark mode, and fixed PricingPage/ChatArea logic.",
+  "status": "Verified Stable"
+}

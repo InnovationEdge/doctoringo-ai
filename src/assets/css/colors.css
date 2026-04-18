@@ -1,0 +1,82 @@
+/**
+ * CSS Custom Properties for Theming
+ * Centralized color system for consistent theming
+ */
+
+:root {
+  /* Primary Brand Colors */
+  --color-primary-blue: #033C81;
+  --color-primary-blue-light: #e6f2ff;
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  /* Text Colors */
+  --color-text-primary: #262626;
+  --color-text-secondary: rgba(0, 0, 0, 0.65);
+  --color-text-disabled: rgba(0, 0, 0, 0.25);
+
+  /* Background Colors */
+  --color-bg-gray: #303030;
+  --color-bg-hover: #f0f0f0;
+
+  /* Message Colors */
+  --color-message-user-bg: #e6f2ff;
+  --color-message-ai-bg: #fafafa;
+  --color-message-ai-border: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] {
+  /* Override for dark mode */
+  --color-text-primary: #d9d9d9;
+  --color-text-secondary: rgba(255, 255, 255, 0.65);
+  --color-text-disabled: rgba(255, 255, 255, 0.25);
+  --color-bg-hover: #f0f0f0;
+  --color-message-user-bg: #033C81;
+  --color-message-ai-bg: rgba(255, 255, 255, 0.08);
+  --color-message-ai-border: rgba(255, 255, 255, 0.12);
+}
+
+/* Legacy classes - maintained for backwards compatibility */
+.bg-gray-300 {
+    background-color: var(--color-bg-gray) !important;
+}
+
+.opacity-60 {
+    opacity: 0.6;
+}
+
+.opacity-100 {
+    opacity: 1;
+}
+
+.primary-blue {
+    color: var(--color-primary-blue) !important;
+}
+
+[data-theme='dark'] .primary-blue,
+[data-theme='dark'] .primary-blue.ant-typography {
+    color: var(--color-white) !important;
+}
+
+.border-primary-blue {
+    border-color: var(--color-primary-blue) !important;
+}
+
+[data-theme='dark'] .border-primary-blue {
+    border-color: var(--color-white) !important;
+}
+
+.primary-blue-button-color {
+    background-color: var(--color-primary-blue) !important;
+    color: var(--color-white) !important;
+}
+
+[data-theme='dark'] .primary-blue-button-color {
+    background-color: var(--color-white) !important;
+    color: var(--color-black) !important;
+}
+
+[data-theme='dark'] .primary-blue-button-color:hover {
+    background-color: var(--color-bg-hover) !important;
+    color: var(--color-black) !important;
+}

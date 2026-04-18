@@ -1,0 +1,131 @@
+.billing-dropdown-card .ant-card-body {
+    padding: 0 !important;
+}
+
+/* ChatGPT-style pricing card */
+.pricing-card {
+    border-radius: 16px !important;
+    border: 1px solid #e5e5e5;
+    transition: all 0.3s ease;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+[data-theme='dark'] .pricing-card {
+    background: #1a1a1a;
+    border-color: #2f2f2f;
+    color: #ffffff;
+}
+
+[data-theme='dark'] .pricing-card .ant-typography {
+    color: #ececec !important;
+}
+
+[data-theme='dark'] .pricing-card .ant-typography-secondary {
+    color: rgba(255, 255, 255, 0.65) !important;
+}
+
+.pricing-card.highlighted {
+    border: 2px solid #000000;
+    transform: scale(1.02);
+    z-index: 100 !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    background: #ffffff;
+}
+
+[data-theme='dark'] .pricing-card.highlighted {
+    border-color: #ffffff;
+    background: #1a1a1a;
+    box-shadow: 0 8px 24px rgba(255, 255, 255, 0.08);
+}
+
+.pricing-card.highlighted::before {
+    content: 'MOST POPULAR';
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #000000;
+    color: #ffffff;
+    padding: 4px 10px;
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 4px;
+    letter-spacing: 0.3px;
+    transform: none;
+}
+
+[data-theme='dark'] .pricing-card.highlighted::before {
+    background: #ffffff !important;
+    color: #000000 !important;
+}
+
+.pricing-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    border-color: #000000;
+}
+
+[data-theme='dark'] .pricing-card:hover {
+    border-color: #ffffff;
+    box-shadow: 0 12px 24px rgba(255, 255, 255, 0.06);
+}
+
+.pricing-card.highlighted:hover {
+    transform: scale(1.02) translateY(-4px);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme='dark'] .pricing-card.highlighted:hover {
+    box-shadow: 0 16px 32px rgba(255, 255, 255, 0.1);
+}
+
+.pricing-features li {
+    position: relative;
+    padding-left: 24px;
+    margin-bottom: 12px;
+    line-height: 1.6;
+}
+
+.pricing-features li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #000000;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+[data-theme='dark'] .pricing-features li::before {
+    color: #ffffff;
+}
+
+/* Pricing page animations */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pricing-card {
+    animation: slideInUp 0.6s ease-out;
+    animation-fill-mode: both;
+}
+
+.pricing-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.pricing-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.pricing-card:nth-child(3) {
+    animation-delay: 0.3s;
+}

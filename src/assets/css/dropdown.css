@@ -1,0 +1,36 @@
+.billing-dropdown-card {
+    width: 400px !important;
+    border-width: 0 !important;
+}
+
+.billing-dropdown-card .ant-card-body img {
+    border-radius: 10px 10px 0 0;
+}
+
+/* Dropdown Menu Appearance */
+.language-dropdown .ant-dropdown-menu {
+    padding: 4px 0;
+    border-radius: 0;
+    box-shadow: none;
+    font-size: 14px;
+    max-width: 150px!important;
+    background-color: inherit;
+}
+
+.language-label {
+    font-size: 16px;
+    font-weight: 400;
+}
+
+/* iOS-style dropdown menu */
+.user-dropdown .ant-dropdown-menu, .user-dropdown .ant-dropdown-menu-sub {
+    padding: 12px!important;
+    border-radius: 13px!important;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.user-dropdown .ant-dropdown-menu-item {
+    border-radius: 10px!important;
+}

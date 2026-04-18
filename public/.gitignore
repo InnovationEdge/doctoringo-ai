@@ -1,0 +1,13 @@
+*
+
+!static/
+!static/**
+!.gitignore
+!.htaccess
+!favicon.ico
+!favicon-16x16.png
+!favicon-32x32.png
+!apple-touch-icon.png
+!favicon.svg
+!.well-known/
+!.well-known/**

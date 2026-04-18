@@ -1,0 +1,14 @@
+/* Logo styling */
+.app-logo {
+    transition: filter 0.3s ease;
+}
+
+/* Make blue logo white in dark mode using CSS filter */
+[data-theme='dark'] .app-logo {
+    filter: brightness(0) invert(1);
+}
+
+/* SVG icons that should be white in dark mode */
+[data-theme='dark'] .svg-icon-blue {
+    filter: brightness(0) invert(1);
+}

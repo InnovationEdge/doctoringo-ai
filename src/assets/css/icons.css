@@ -1,0 +1,10 @@
+.content-copy-icon {
+    position: absolute;
+    top: 0;
+    left: -28px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: opacity 0.3s ease-in-out;
+}
+
+

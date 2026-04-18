@@ -1,0 +1,113 @@
+/* iOS-style rounded textarea */
+.rounded-textarea {
+    border-radius: 20px !important;
+    padding: 14px 56px 14px 60px !important;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    line-height: 1.6;
+}
+
+.rounded-textarea:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: rgba(0, 58, 128, 0.3) !important;
+}
+
+.rounded-textarea:focus {
+    box-shadow: 0 4px 16px rgba(0, 58, 128, 0.2) !important;
+    border-color: #033C81 !important;
+}
+
+[data-theme='dark'] .rounded-textarea {
+    border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+[data-theme='dark'] .rounded-textarea:hover {
+    border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.textarea-theme-light[disabled] {
+    background-color: rgb(242, 242, 242) !important;
+}
+
+.textarea-theme-dark[disabled] {
+    background-color: rgb(48, 48, 48) !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background-color: transparent !important;
+    border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.35);
+}
+
+[data-theme='dark'] .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme='dark'] .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+/* Hide caret when textarea is empty and showing placeholder */
+.ant-input:placeholder-shown,
+.ant-input-affix-wrapper .ant-input:placeholder-shown,
+textarea.ant-input:placeholder-shown {
+    caret-color: transparent;
+}
+
+.ant-input:focus:not(:placeholder-shown),
+.ant-input-affix-wrapper .ant-input:focus:not(:placeholder-shown),
+textarea.ant-input:focus:not(:placeholder-shown) {
+    caret-color: auto;
+}
+
+[data-theme='dark'] .ant-input:focus:not(:placeholder-shown),
+[data-theme='dark'] .ant-input-affix-wrapper .ant-input:focus:not(:placeholder-shown),
+[data-theme='dark'] textarea.ant-input:focus:not(:placeholder-shown) {
+    caret-color: #ececec;
+}
+
+/*RADIO BUTTONS*/
+.ant-radio-button-wrapper-checked  {
+    background-color: #033C81!important;
+    color: #ffffff!important;
+}
+
+[data-theme='dark'] .ant-radio-button-wrapper-checked {
+    background-color: #ffffff!important;
+    color: #000000!important;
+}
+
+[data-theme='dark'] .ant-radio-button-wrapper {
+    background-color: transparent!important;
+    color: #ffffff!important;
+    border-color: rgba(255, 255, 255, 0.3)!important;
+}
+
+/* Typewriter animation for placeholder text */
+@keyframes typewriter-cursor {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+#chat-input-main::placeholder {
+    animation: typewriter-cursor 1s ease-in-out infinite;
+}
+
+#chat-input-main:focus::placeholder {
+    animation: none;
+    opacity: 0.5;
+}

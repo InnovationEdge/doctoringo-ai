@@ -1,0 +1,29 @@
+/* Mobile burger menu styling */
+.ant-drawer .ant-menu-item {
+    border-radius: 8px !important;
+    margin: 4px 0 !important;
+    padding: 12px 16px !important;
+    height: auto !important;
+}
+
+.ant-drawer .ant-menu-item:hover {
+    background-color: rgba(0, 58, 128, 0.08) !important;
+}
+
+[data-theme='dark'] .ant-drawer .ant-menu-item:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Dark mode drawer background */
+[data-theme='dark'] .ant-drawer .ant-drawer-content {
+    background-color: #1f1f1f !important;
+}
+
+[data-theme='dark'] .ant-drawer .ant-drawer-header {
+    background-color: #1f1f1f !important;
+    border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme='dark'] .ant-drawer .ant-drawer-body {
+    background-color: #1f1f1f !important;
+}

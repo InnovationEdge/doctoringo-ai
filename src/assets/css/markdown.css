@@ -1,0 +1,311 @@
+/* ========== Markdown Renderer Styles ========== */
+
+/* Paragraph */
+.md-paragraph {
+    margin: 0;
+    margin-bottom: 8px;
+    line-height: 1.65;
+}
+
+.md-paragraph:first-child {
+    margin-top: 0;
+}
+
+.md-paragraph:last-child {
+    margin-bottom: 0;
+}
+
+/* Headings */
+.md-h1 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-top: 16px;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+}
+
+.md-h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 14px;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+.md-h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 12px;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+/* Lists */
+.md-ul {
+    margin-left: 20px;
+    margin-bottom: 12px;
+    line-height: 1.7;
+}
+
+.md-ol {
+    margin-left: 20px;
+    margin-bottom: 12px;
+    line-height: 1.7;
+}
+
+.md-li {
+    margin-bottom: 6px;
+}
+
+/* Blockquote */
+.md-blockquote {
+    border-left: 4px solid var(--md-blockquote-border);
+    padding-left: 16px;
+    margin: 12px 0;
+    font-style: italic;
+    opacity: 0.9;
+}
+
+[data-theme='light'] {
+    --md-blockquote-border: rgba(13, 13, 13, 0.3);
+}
+
+[data-theme='dark'] {
+    --md-blockquote-border: rgba(236, 236, 236, 0.4);
+}
+
+/* Code blocks */
+.md-pre {
+    background-color: var(--md-code-bg);
+    padding: 12px;
+    border-radius: 10px;
+    margin: 12px 0;
+    overflow: auto;
+}
+
+.md-code {
+    background-color: var(--md-code-bg);
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-family: 'SF Mono', 'Fira Code', 'Monaco', monospace;
+    font-size: 0.9em;
+}
+
+.md-code-inline {
+    background-color: var(--md-inline-code-bg);
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-family: 'SF Mono', 'Fira Code', 'Monaco', monospace;
+    font-size: 0.9em;
+    color: var(--md-inline-code-color);
+}
+
+[data-theme='light'] {
+    --md-code-bg: rgba(0, 0, 0, 0.05);
+    --md-inline-code-bg: rgba(13, 13, 13, 0.08);
+    --md-inline-code-color: #1a1a1a;
+}
+
+[data-theme='dark'] {
+    --md-code-bg: rgba(0, 0, 0, 0.3);
+    --md-inline-code-bg: rgba(236, 236, 236, 0.1);
+    --md-inline-code-color: #a0d8ef;
+}
+
+/* Strong text */
+.md-strong {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Links */
+.md-link {
+    color: var(--md-link-color);
+    text-decoration: underline;
+    transition: color 0.15s ease;
+}
+
+.md-link:hover {
+    color: var(--md-link-hover);
+}
+
+.md-link-placeholder {
+    color: var(--md-link-color);
+    text-decoration: underline;
+    cursor: default;
+}
+
+.md-link-internal {
+    color: var(--md-link-color);
+    text-decoration: underline;
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
+.md-link-internal:hover {
+    color: var(--md-link-hover);
+}
+
+.md-link-legal {
+    color: var(--md-legal-link-color);
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    font-weight: 500;
+    transition: all 0.15s ease;
+}
+
+.md-link-legal:hover {
+    color: var(--md-link-hover);
+    text-decoration-style: solid;
+}
+
+[data-theme='light'] {
+    --md-link-color: #1890ff;
+    --md-link-hover: #40a9ff;
+    --md-legal-link-color: #1a73e8;
+}
+
+[data-theme='dark'] {
+    --md-link-color: #69b1ff;
+    --md-link-hover: #85c1ff;
+    --md-legal-link-color: #69b1ff;
+}
+
+/* Table styles */
+.md-table-wrapper {
+    overflow-x: auto;
+    margin: 16px 0;
+}
+
+.md-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid var(--md-table-border);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.md-thead {
+    background-color: var(--md-thead-bg);
+}
+
+.md-tr {
+    border-bottom: 1px solid var(--md-table-row-border);
+}
+
+.md-th {
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.md-td {
+    padding: 12px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+[data-theme='light'] {
+    --md-table-border: rgba(0, 0, 0, 0.1);
+    --md-thead-bg: rgba(13, 13, 13, 0.05);
+    --md-table-row-border: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] {
+    --md-table-border: rgba(255, 255, 255, 0.15);
+    --md-thead-bg: rgba(236, 236, 236, 0.1);
+    --md-table-row-border: rgba(255, 255, 255, 0.1);
+}
+
+/* Horizontal rule */
+.md-hr {
+    margin: 20px 0;
+    border: none;
+    border-top: 1px solid var(--md-hr-color);
+    height: 1px;
+}
+
+[data-theme='light'] {
+    --md-hr-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme='dark'] {
+    --md-hr-color: rgba(255, 255, 255, 0.12);
+}
+
+/* ========== Download Card Styles ========== */
+.md-download-card {
+    margin-top: 16px;
+    margin-bottom: 12px;
+    padding: 16px;
+    border-radius: 13px;
+    background-color: var(--md-download-bg);
+    border: 1px solid var(--md-download-border);
+}
+
+.md-download-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.md-download-check {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #52c41a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.md-download-ready {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--md-download-ready-color);
+}
+
+.md-download-desc {
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.md-download-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 48px;
+    border-radius: 13px;
+    background-color: #033C81;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(0, 58, 128, 0.25);
+    transition: background-color 0.15s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.md-download-btn:hover {
+    background-color: #004a9f;
+}
+
+[data-theme='light'] {
+    --md-download-bg: rgba(82, 196, 26, 0.05);
+    --md-download-border: rgba(82, 196, 26, 0.2);
+    --md-download-ready-color: #389e0d;
+}
+
+[data-theme='dark'] {
+    --md-download-bg: rgba(82, 196, 26, 0.08);
+    --md-download-border: rgba(82, 196, 26, 0.3);
+    --md-download-ready-color: #95de64;
+}

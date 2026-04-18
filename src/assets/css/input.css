@@ -1,0 +1,141 @@
+/* ========== Input Component Styles ========== */
+
+/* Input wrapper */
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* Base input styles */
+.input {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid var(--input-border);
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.input::placeholder {
+    color: var(--text-secondary);
+}
+
+/* Size variants */
+.input-sm {
+    padding: 6px 12px;
+    font-size: 14px;
+}
+
+.input-md {
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+.input-lg {
+    padding: 12px 16px;
+    font-size: 16px;
+}
+
+/* With prefix/suffix padding */
+.input.has-prefix {
+    padding-left: 40px;
+}
+
+.input.has-suffix {
+    padding-right: 40px;
+}
+
+/* Prefix icon */
+.input-prefix {
+    position: absolute;
+    left: 12px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+}
+
+/* Suffix container */
+.input-suffix {
+    position: absolute;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Clear button */
+.input-clear-btn {
+    color: var(--text-secondary);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s ease;
+}
+
+.input-clear-btn:hover {
+    color: var(--text-primary);
+}
+
+/* Theme variables */
+[data-theme='light'] {
+    --input-border: #d1d5db;
+    --input-bg: #ffffff;
+}
+
+[data-theme='dark'] {
+    --input-border: #3f3f3f;
+    --input-bg: #262626;
+}
+
+/* ========== TextArea Styles ========== */
+
+.textarea {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid var(--input-border);
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    resize: none;
+}
+
+.textarea:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.textarea::placeholder {
+    color: var(--text-secondary);
+}
+
+/* Size variants */
+.textarea-sm {
+    padding: 6px 12px;
+    font-size: 14px;
+}
+
+.textarea-md {
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+.textarea-lg {
+    padding: 12px 16px;
+    font-size: 16px;
+}
+
+/* Auto-resize mode */
+.textarea.autosize {
+    overflow: hidden;
+}

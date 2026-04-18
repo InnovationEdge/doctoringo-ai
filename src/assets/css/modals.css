@@ -1,0 +1,14 @@
+.welcome-back-modal {
+    top: 300px;
+}
+
+.welcome-back-modal .ant-modal-content{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.welcome-back-modal .ant-modal-title {
+    font-size: 25px;
+}

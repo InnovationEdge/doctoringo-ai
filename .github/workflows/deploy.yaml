@@ -1,0 +1,104 @@
+name: Build and Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: knowhowai
+  SERVICE_NAME: knowhow-frontend
+  REGION: europe-west3
+  ARTIFACT_REGISTRY_REPO: knowhowai  # Your Artifact Registry repository name
+  ARTIFACT_REGISTRY_LOCATION: europe-west3  # Should match REGION
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{ env.ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev
+
+      - name: Build & Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          build-args: |
+            VITE_API_BASE_URL=https://api.knowhow.ge
+            VITE_FIREBASE_API_KEY=AIzaSyAxCjkt33nKGJDBCgdPJ-tMKNQPM27gD3o
+            VITE_FIREBASE_AUTH_DOMAIN=knowhowai-5ccf5.firebaseapp.com
+            VITE_FIREBASE_PROJECT_ID=knowhowai-5ccf5
+            VITE_FIREBASE_STORAGE_BUCKET=knowhowai-5ccf5.firebasestorage.app
+            VITE_FIREBASE_MESSAGING_SENDER_ID=656836586331
+            VITE_FIREBASE_APP_ID=1:656836586331:web:c1efeed4900d95e52e887e
+            VITE_FIREBASE_MEASUREMENT_ID=G-7LGG85DRZS
+          tags: ${{ env.ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REGISTRY_REPO }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+
+      - name: Deploy Frontend to Cloud Run
+        run: |
+          IMAGE=${{ env.ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REGISTRY_REPO }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          echo "Deploying knowhow-frontend to Cloud Run (cost-optimized)..."
+          gcloud run deploy knowhow-frontend \
+            --image $IMAGE \
+            --region $REGION \
+            --platform managed \
+            --allow-unauthenticated \
+            --port=80 \
+            --cpu=1 \
+            --memory=256Mi \
+            --min-instances=0 \
+            --max-instances=3 \
+            --cpu-boost \
+            --no-traffic \
+            --tag=build-${{ github.run_number }} \
+            --remove-env-vars=DB_NAME,DB_USER,DB_HOST,DB_PORT \
+            --clear-secrets
+
+          # Update traffic to new revision (forces cache invalidation)
+          gcloud run services update-traffic knowhow-frontend \
+            --region=$REGION \
+            --to-latest
+
+      - name: Get Cloud Run URL
+        id: get-url
+        run: |
+          SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
+            --region=${{ env.REGION }} \
+            --format='value(status.url)')
+          echo "service_url=$SERVICE_URL" >> $GITHUB_OUTPUT
+          echo "Deployed to: $SERVICE_URL"
+
+      # Cleanup old Docker images (keep last 10)
+      - name: Cleanup old Docker images
+        run: |
+          echo "Cleaning up old Docker images..."
+          gcloud artifacts docker images list \
+            ${{ env.ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REGISTRY_REPO }}/${{ env.SERVICE_NAME }} \
+            --format="value(version)" \
+            --sort-by="~CREATE_TIME" | tail -n +11 | while read digest; do
+            gcloud artifacts docker images delete \
+              "${{ env.ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REGISTRY_REPO }}/${{ env.SERVICE_NAME }}@${digest}" \
+              --quiet --delete-tags 2>/dev/null || true
+          done
+          echo "Image cleanup complete"

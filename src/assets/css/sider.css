@@ -1,0 +1,48 @@
+/* Hide Antd Sider trigger completely */
+.ant-layout-sider-trigger {
+    display: none !important;
+}
+
+.sider-modal {
+    min-height: 200px !important;
+    flex-grow: 1 !important;
+}
+
+/* Sidebar improvements - Grok style: no shadow, only border */
+.ant-layout-sider {
+    box-shadow: none;
+    border-right: 1px solid var(--border-color);
+    pointer-events: auto !important;
+    z-index: 1000 !important;
+}
+
+.chat-history-list .ant-list-item {
+    transition: all 0.2s ease;
+}
+
+.chat-history-list .ant-list-item:hover {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+[data-theme='dark'] .chat-history-list .ant-list-item:hover {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Sidebar button borders for dark mode */
+[data-theme='dark'] .ant-layout-sider .ant-btn-text {
+    border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+[data-theme='dark'] .ant-layout-sider .ant-btn-primary {
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* New chat icon color inversion for dark mode */
+[data-theme='dark'] .new-chat-icon {
+    filter: brightness(0) invert(1);
+}
+
+/* New chat button border for dark mode */
+[data-theme='dark'] .new-chat-button {
+    border-color: rgba(255, 255, 255, 0.15) !important;
+}

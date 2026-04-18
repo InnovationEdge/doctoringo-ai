@@ -1,0 +1,358 @@
+/* ========== Model Selector Styles ========== */
+
+/* Container */
+.model-selector {
+    position: relative;
+    display: inline-block;
+}
+
+/* Trigger Button */
+.model-selector-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 12px;
+    height: 32px;
+    border-radius: 16px;
+    background-color: transparent;
+    border: none;
+    font-weight: 500;
+    font-size: 13px;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+
+[data-theme='light'] .model-selector-trigger {
+    color: #1a1a1a;
+}
+
+[data-theme='dark'] .model-selector-trigger {
+    color: #ffffff;
+}
+
+.model-selector-trigger:hover {
+    background-color: var(--pill-hover-bg);
+}
+
+.model-selector-trigger:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.model-selector-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+[data-theme='light'] .model-selector-icon {
+    color: #1a1a1a;
+}
+
+[data-theme='dark'] .model-selector-icon {
+    color: #ffffff;
+}
+
+.model-selector-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+.model-selector-name {
+    white-space: nowrap;
+}
+
+/* Trigger quota badge (visible on trigger button) */
+.model-selector-trigger-quota {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 600;
+    margin-left: 4px;
+    background-color: var(--quota-premium-bg);
+    color: #8b5cf6;
+}
+
+.model-selector-trigger-quota.exhausted {
+    background-color: var(--quota-exhausted-bg);
+    color: #ef4444;
+}
+
+/* Chevron icon */
+.model-selector-chevron {
+    transition: transform 0.2s ease;
+    opacity: 0.6;
+}
+
+.model-selector-chevron.open {
+    transform: rotate(180deg);
+}
+
+/* Dropdown - opens downward by default */
+.model-selector-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    border-radius: 12px;
+    padding: 6px;
+    width: 220px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border: none;
+    z-index: 1000;
+    animation: dropdownFadeIn 0.15s ease-out;
+}
+
+/* Dropdown opens upward */
+.model-selector-dropdown.direction-up {
+    top: auto;
+    bottom: calc(100% + 8px);
+    animation: dropdownFadeInUp 0.15s ease-out;
+}
+
+@keyframes dropdownFadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+[data-theme='light'] .model-selector-dropdown {
+    background-color: #ffffff;
+}
+
+[data-theme='dark'] .model-selector-dropdown {
+    background-color: #2a2a2a;
+}
+
+.model-selector-dropdown.mobile {
+    width: 260px;
+}
+
+/* Dropdown item */
+.model-selector-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    outline: none;
+    text-align: left;
+    transition: background-color 0.15s ease;
+}
+
+.model-selector-item:hover:not(:disabled) {
+    background-color: var(--item-hover-bg);
+}
+
+.model-selector-item.selected {
+    background-color: var(--selected-bg);
+}
+
+.model-selector-item:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.model-selector-item + .model-selector-item {
+    margin-top: 4px;
+}
+
+/* Item content */
+.model-selector-item-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Item icons - consistent sizing */
+.model-selector-item-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.model-selector-item-icon svg {
+    width: 14px;
+    height: 14px;
+}
+
+.model-selector-item-icon.pro {
+    color: #8b5cf6;
+}
+
+.model-selector-item-icon.basic {
+    color: var(--text-secondary);
+}
+
+.model-selector-item-icon.upgrade {
+    color: #f59e0b;
+}
+
+.model-selector-item-name {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-primary);
+}
+
+.model-selector-item-desc {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 1px;
+}
+
+/* Item right side */
+.model-selector-item-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Quota badge */
+.model-selector-quota {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.model-selector-quota.premium {
+    background-color: var(--quota-premium-bg);
+    color: #8b5cf6;
+}
+
+.model-selector-quota.exhausted {
+    background-color: var(--quota-exhausted-bg);
+    color: var(--text-secondary);
+}
+
+.model-selector-quota.unlimited {
+    background-color: var(--quota-unlimited-bg);
+    color: #22c55e;
+}
+
+[data-theme='light'] {
+    --quota-premium-bg: rgba(139, 92, 246, 0.1);
+    --quota-exhausted-bg: rgba(102, 102, 102, 0.15);
+    --quota-unlimited-bg: rgba(34, 197, 94, 0.1);
+}
+
+[data-theme='dark'] {
+    --quota-premium-bg: rgba(139, 92, 246, 0.2);
+    --quota-exhausted-bg: rgba(102, 102, 102, 0.3);
+    --quota-unlimited-bg: rgba(34, 197, 94, 0.15);
+}
+
+/* Check icon */
+.model-selector-check {
+    display: flex;
+}
+
+.model-selector-check.premium {
+    color: #8b5cf6;
+}
+
+.model-selector-check.standard {
+    color: #3b82f6;
+}
+
+/* Quota reset info */
+.model-selector-reset-info {
+    padding: 6px 12px;
+    margin-top: 4px;
+    font-size: 10px;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+/* Upgrade button */
+.model-selector-upgrade {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    margin-top: 6px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    border-radius: 0 0 8px 8px;
+    background-color: transparent;
+    cursor: pointer;
+    outline: none;
+    text-align: left;
+    transition: background-color 0.15s ease;
+}
+
+.model-selector-upgrade:hover {
+    background-color: var(--item-hover-bg);
+}
+
+.model-selector-upgrade-name {
+    font-weight: 600;
+    font-size: 13px;
+    color: #f59e0b;
+}
+
+.model-selector-upgrade-desc {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 1px;
+}
+
+/* Quota Exceeded Banner */
+.model-selector-quota-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 10px;
+    background-color: rgba(212, 142, 108, 0.1);
+    border: 1px solid rgba(212, 142, 108, 0.2);
+    margin-bottom: 6px;
+}
+
+.model-selector-quota-banner-text {
+    font-size: 11px;
+    font-weight: 500;
+    color: #033C81;
+    flex: 1;
+}
+
+.model-selector-quota-banner-btn {
+    padding: 3px 10px;
+    border-radius: 6px;
+    background-color: #033C81;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.15s ease;
+}
+
+.model-selector-quota-banner-btn:hover {
+    background-color: #c47a58;
+}

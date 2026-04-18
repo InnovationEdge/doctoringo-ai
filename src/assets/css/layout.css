@@ -1,0 +1,12 @@
+.max-content-height {
+    overflow-y: hidden;
+    max-height: calc(100vh - 65px - 55px) !important;
+}
+
+.inner-content {
+    overflow-y: auto !important;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    /*max-height: calc(100vh - 65px - 55px) !important;*/
+}

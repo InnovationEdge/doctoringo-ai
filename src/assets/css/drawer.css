@@ -1,0 +1,94 @@
+/* ========== Drawer Component Styles ========== */
+
+/* Overlay */
+.drawer-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+}
+
+/* Backdrop */
+.drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.45);
+    transition: opacity 0.3s ease;
+}
+
+/* Panel base */
+.drawer-panel {
+    position: fixed;
+    background-color: var(--dropdown-bg);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    transition: transform 0.3s ease-out;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Placement variants */
+.drawer-panel.left {
+    left: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.drawer-panel.right {
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.drawer-panel.top {
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+.drawer-panel.bottom {
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+/* Header */
+.drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+/* Title */
+.drawer-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Close button */
+.drawer-close-btn {
+    padding: 4px;
+    color: var(--text-secondary);
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.drawer-close-btn:hover {
+    color: var(--text-primary);
+    background-color: var(--item-hover-bg);
+}
+
+/* Body */
+.drawer-body {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+}
