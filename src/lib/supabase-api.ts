@@ -122,6 +122,44 @@ export const authApi = {
 // ═══════════════════════════════════════════════════════════════════════════
 const EDGE_CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 
+// Guest mode — in-memory storage + system prompt (same quality as Edge Function)
+const guestMessages: Record<string, { role: string; content: string }[]> = {};
+
+const GUEST_SYSTEM_PROMPT = `შენ ხარ **Doctoringo AI** — სამედიცინო ასისტენტი, შექმნილი Doctoringo-ს მიერ.
+
+შენი პიროვნება: გამოცდილი, ჭკვიანი, ემპათიური ოჯახის ექიმი, რომელიც პაციენტს არა როგორც კითხვარი, არამედ როგორც ცოცხალ ადამიანს ესაუბრება.
+
+# ენის სტანდარტი
+- ქართულად → ბუნებრივი ქართული, "თქვენ" ფორმა
+- English → respond in clear, warm professional English
+- Русский → отвечай на естественном русском
+- სამედიცინო ტერმინები: პირველ ხმარებაზე ახსენი ("ჰიპერტენზია — არტერიული წნევის მომატება")
+
+აკრძალული ფრაზები:
+❌ "დიდი სიამოვნებით გეხმარებით"
+❌ "გთხოვთ გაითვალისწინოთ, რომ..."
+❌ მუდმივი გაფრთხილებები ყოველ პასუხში
+❌ მისალმების გამეორება უკვე დაწყებულ დიალოგში
+
+# KYC: Know Your Patient
+ოქროს წესი: არასდროს გასცე რჩევა კონტექსტის გარეშე.
+პირველ რეპლიკაში: დააზუსტე ასაკი, სქესი, ხანგრძლივობა.
+
+# კლინიკური აზროვნება
+1. Red flags → 🚨 112-ზე დარეკვა + first-aid ნაბიჯები
+2. დიფერენციული დიაგნოზი — 2-3 სავარაუდო მიზეზი
+3. მართვის გეგმა: რა გააკეთოს, რა არ, როდის ექიმთან
+
+# რა არ უნდა გააკეთო
+❌ რეცეპტურ მედიკამენტებზე კონკრეტული დოზირება
+✅ OTC მედიკამენტებზე დოზა OK (Paracetamol, Ibuprofen)
+❌ საბოლოო დიაგნოზი — "სავარაუდოდ...", "ხშირად მიუთითებს..."
+❌ დაუდასტურებელი მეთოდები (ჰომეოპათია, "ბუნებრივი detox")
+❌ პასუხისმგებლობის გადატანა მარტივი "ექიმი ნახეთ"-ით
+
+# მიზანი
+ეფექტურად დაეხმარო პაციენტს სწორი გადაწყვეტილება მიიღოს.`;
+
 export const chatApi = {
   listSessions: async (): Promise<ChatSession[]> => {
     const { data, error } = await supabase
@@ -210,29 +248,100 @@ export const chatApi = {
     model_tier?: ModelTier;
     signal?: AbortSignal;
   }): Promise<Response> => {
+    // Check if user is logged in
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session) throw new ApiError(401, { message: 'Not authenticated' });
 
-    const response = await fetch(EDGE_CHAT_URL, {
+    if (session) {
+      // Logged in → use Edge Function (API key stays server-side)
+      const response = await fetch(EDGE_CHAT_URL, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        signal: params.signal,
+        body: JSON.stringify({
+          session_id: params.sessionId,
+          message: params.message,
+          model_tier: params.model_tier || 'reasoning',
+        }),
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new ApiError(response.status, err);
+      }
+      return response;
+    }
+
+    // Guest mode → call Grok API directly
+    const XAI_KEY = import.meta.env.VITE_XAI_API_KEY || '';
+    if (!XAI_KEY) throw new ApiError(503, { error: 'AI not configured' });
+
+    // Save to local memory
+    if (!guestMessages[params.sessionId || '']) guestMessages[params.sessionId || ''] = [];
+    const msgs = guestMessages[params.sessionId || ''];
+    msgs.push({ role: 'user', content: params.message });
+
+    const apiMessages = [
+      { role: 'system' as const, content: GUEST_SYSTEM_PROMPT },
+      ...msgs.slice(-20),
+    ];
+
+    const response = await fetch('https://api.x.ai/v1/chat/completions', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${session.access_token}`,
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Authorization': `Bearer ${XAI_KEY}`, 'Content-Type': 'application/json' },
       signal: params.signal,
-      body: JSON.stringify({
-        session_id: params.sessionId,
-        message: params.message,
-        model_tier: params.model_tier || 'reasoning',
-      }),
+      body: JSON.stringify({ model: 'grok-4-1-fast-reasoning', messages: apiMessages, stream: true, temperature: 0.3, max_tokens: 3000 }),
     });
 
     if (!response.ok) {
-      const err = await response.json().catch(() => ({ error: 'Unknown error' }));
-      throw new ApiError(response.status, err);
+      const err = await response.text().catch(() => '');
+      throw new ApiError(response.status, { error: err || 'AI service error' });
     }
 
-    return response;
+    // Wrap stream to collect assistant message
+    const reader = response.body!.getReader();
+    const decoder = new TextDecoder();
+    const encoder = new TextEncoder();
+    let fullContent = '';
+
+    const wrappedStream = new ReadableStream({
+      async start(controller) {
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ session_id: params.sessionId || 'guest' })}\n\n`));
+        let buffer = '';
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
+            for (const line of lines) {
+              if (!line.startsWith('data: ')) continue;
+              const data = line.slice(6).trim();
+              if (data === '[DONE]') continue;
+              try {
+                const parsed = JSON.parse(data);
+                const content = parsed.choices?.[0]?.delta?.content;
+                if (content) {
+                  fullContent += content;
+                  controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`));
+                }
+              } catch { /* skip */ }
+            }
+          }
+          if (fullContent) msgs.push({ role: 'assistant', content: fullContent });
+          controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+          controller.close();
+        } catch {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: 'Stream interrupted' })}\n\n`));
+          controller.close();
+        }
+      },
+    });
+
+    return new Response(wrappedStream, { headers: { 'Content-Type': 'text/event-stream' } });
   },
 
   sendMessage: async (params: {

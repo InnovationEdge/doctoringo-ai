@@ -5,6 +5,7 @@ import { ChatArea } from './components/ChatArea';
 import { ChatsPage } from './components/ChatsPage';
 import { AuthGuard, PublicRoute } from './components/AuthGuard';
 import { authApi, chatApi, paymentApi } from './lib/api';
+import { supabase } from './lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
 import { ThemeProvider } from './components/ThemeContext';
 import { useTranslation } from './providers/TranslationProvider';
@@ -89,25 +90,46 @@ function AppContent() {
   const [showPlans, setShowPlans] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
 
-  // Initialize app — no auth required, everyone can use the chat
+  // Initialize — allow everyone in, check auth in background
   useEffect(() => {
     const initializeAuth = async () => {
-      setIsAuthenticated(true);
-      setUser({ id: 'guest', email: '', first_name: '', last_name: '' });
-      setIsLoading(false);
+      try {
+        const userData = await authApi.getCurrentUser();
+        if (userData && userData.id) {
+          setUser(userData);
+          setIsAuthenticated(true);
+        } else {
+          // Guest mode — still allow access
+          setUser({ id: 'guest', email: '', first_name: '', last_name: '' });
+          setIsAuthenticated(true);
+        }
+      } catch {
+        // Guest mode
+        setUser({ id: 'guest', email: '', first_name: '', last_name: '' });
+        setIsAuthenticated(true);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     initializeAuth();
 
-    // Listen for session expiry - only update state, let AuthGuard handle routing
+    // Listen for Supabase auth state changes (OAuth callback)
+    const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        const userData = await authApi.getCurrentUser();
+        if (userData) {
+          setUser(userData);
+          setIsAuthenticated(true);
+          navigate('/app', { replace: true });
+        }
+      }
+    });
+
     const handleSessionExpired = () => {
-      setIsAuthenticated(false);
-      setUser(null);
-      setCurrentChatId(null);
-      setCurrentChatTitle(null);
-      setChats([]);
-      localStorage.removeItem('doctoringo_user');
-      // Don't navigate here - AuthGuard will redirect to '/' when isAuthenticated becomes false
+      // Stay in guest mode instead of locking out
+      setUser({ id: 'guest', email: '', first_name: '', last_name: '' });
+      setIsAuthenticated(true);
     };
 
     const handleNewChatStarted = () => {
@@ -453,7 +475,7 @@ function AppContent() {
           }
         />
 
-        {/* Main app route - direct access, no auth */}
+        {/* Main app route - login required */}
         <Route
           path="/app"
           element={
@@ -461,8 +483,10 @@ function AppContent() {
               <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#171717]">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white" />
               </div>
-            ) : (
+            ) : isAuthenticated ? (
               dashboardLayout
+            ) : (
+              <DoctorinoLoginPage onLogin={handleLogin} />
             )
           }
         />
