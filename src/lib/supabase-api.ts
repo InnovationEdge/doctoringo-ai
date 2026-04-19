@@ -1,6 +1,8 @@
 /**
  * Doctoringo AI — Supabase API Layer
- * Drop-in replacement for Django api.ts, backed by Supabase
+ *
+ * Chat goes through Supabase Edge Function `/chat` (keeps xAI API key server-side).
+ * Sessions and messages are persisted in Supabase DB with RLS.
  */
 import { supabase } from './supabase';
 
@@ -8,27 +10,43 @@ export class ApiError extends Error {
   status: number;
   data: any;
   constructor(status: number, data: any) {
-    super(data.detail || data.error || data.message || 'An API error occurred');
+    super(data?.detail || data?.error || data?.message || 'An API error occurred');
     this.name = 'ApiError';
     this.status = status;
     this.data = data;
   }
 }
 
-/**
- * Authentication API (Supabase Auth)
- */
+export interface ChatSession {
+  id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  session_id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  created_at: string;
+  is_emergency?: boolean;
+  timestamp?: string;
+  isUser?: boolean;
+}
+
+export type ModelTier = 'fast' | 'reasoning' | 'premium';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Auth API
+// ═══════════════════════════════════════════════════════════════════════════
 export const authApi = {
-  initCsrf: async () => {
-    // Not needed with Supabase — no-op
-    return true;
-  },
+  initCsrf: async () => true,
 
   getCurrentUser: async () => {
     const { data: { user }, error } = await supabase.auth.getUser();
     if (error || !user) return null;
 
-    // Get profile (may not exist yet for new users)
     const { data: profile } = await supabase
       .from('profiles')
       .select('*')
@@ -50,11 +68,9 @@ export const authApi = {
     localStorage.setItem('postLoginRedirect', window.location.pathname);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: {
-        redirectTo: window.location.origin + '/app',
-      },
+      options: { redirectTo: window.location.origin + '/app' },
     });
-    if (error) console.error('Google login error:', error);
+    if (error) throw new ApiError(400, error);
   },
 
   logout: async () => {
@@ -78,255 +94,197 @@ export const authApi = {
     return updated;
   },
 
-  exportUserData: async () => {
-    const user = await authApi.getCurrentUser();
-    return user;
-  },
-
-  deleteAccount: async (_confirmation: string) => {
-    // Would need service_role for actual deletion
-    await supabase.auth.signOut();
-  },
-
   logoutAllDevices: async () => {
     await supabase.auth.signOut({ scope: 'global' });
+  },
+
+  exportUserData: async () => {
+    const user = await authApi.getCurrentUser();
+    if (!user) return null;
+
+    const { data: sessions } = await supabase
+      .from('chat_sessions')
+      .select('*, chat_messages(*)')
+      .order('created_at', { ascending: false });
+
+    return { user, sessions };
+  },
+
+  deleteAccount: async (_confirmation?: string) => {
+    await supabase.auth.signOut();
   },
 
   getActiveSessions: async () => [],
 };
 
-/**
- * Chat API (Supabase DB + Edge Functions)
- */
-// In-memory chat storage (no auth needed)
-const localSessions: { id: string; title: string; created_at: string; updated_at: string }[] = [];
-const localMessages: Record<string, { id: string; role: string; content: string; created_at: string }[]> = {};
-
-const XAI_API_KEY = import.meta.env.VITE_XAI_API_KEY || '';
-
-// Medical system prompt
-const SYSTEM_PROMPT = `You are Doctoringo AI — a knowledgeable, empathetic medical health assistant created by Doctoringo.
-
-CORE BEHAVIOR:
-- Answer medical questions directly, thoroughly, and confidently
-- Provide specific, actionable health advice based on current medical knowledge
-- Explain conditions, symptoms, medications, treatments in detail
-- Give nutritional plans, mental health guidance, exercise recommendations
-- You CAN and SHOULD give medical information freely — this is your purpose
-
-CONVERSATION STYLE:
-- Be warm but professional, like a trusted family doctor
-- Do NOT repeat greetings — if the user already said hello, get straight to the point
-- Do NOT say "I don't have the right to..." or "I can't provide medical advice" — you absolutely can and should
-- Do NOT add excessive disclaimers to every response
-- Keep responses focused and useful, not padded with warnings
-
-WHEN TO RECOMMEND A DOCTOR:
-- ONLY when the situation involves: emergency symptoms (chest pain, difficulty breathing, severe bleeding), need for physical examination, prescription medications, surgical decisions, or ongoing serious conditions
-- Frame it naturally: "ამ შემთხვევაში ექიმთან ვიზიტი მნიშვნელოვანია" — not as a disclaimer but as genuine medical guidance
-
-LANGUAGE:
-- Respond in the SAME language the user writes in (Georgian, English, or Russian)
-- Use medical terminology but explain it simply
-- Be concise — no filler text`;
+// ═══════════════════════════════════════════════════════════════════════════
+// Chat API
+// ═══════════════════════════════════════════════════════════════════════════
+const EDGE_CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 
 export const chatApi = {
-  createSession: async (title: string = 'New Chat') => {
-    const session = {
-      id: crypto.randomUUID(),
-      title,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-    localSessions.unshift(session);
-    localMessages[session.id] = [];
-    return session;
+  listSessions: async (): Promise<ChatSession[]> => {
+    const { data, error } = await supabase
+      .from('chat_sessions')
+      .select('id, title, created_at, updated_at')
+      .order('updated_at', { ascending: false });
+
+    if (error) throw new ApiError(500, error);
+    return data || [];
   },
 
-  listSessions: async () => localSessions,
+  createSession: async (title: string = 'New Chat'): Promise<ChatSession> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new ApiError(401, { message: 'Not authenticated' });
 
-  getSessionHistory: async (sessionId: string) => {
-    return (localMessages[sessionId] || []).map((m) => ({
-      ...m,
+    const { data, error } = await supabase
+      .from('chat_sessions')
+      .insert({ user_id: user.id, title })
+      .select()
+      .single();
+
+    if (error) throw new ApiError(500, error);
+    return data;
+  },
+
+  getSessionHistory: async (sessionId: string): Promise<ChatMessage[]> => {
+    const { data, error } = await supabase
+      .from('chat_messages')
+      .select('id, session_id, role, content, created_at, is_emergency')
+      .eq('session_id', sessionId)
+      .in('role', ['user', 'assistant'])
+      .order('created_at', { ascending: true });
+
+    if (error) throw new ApiError(500, error);
+
+    return (data || []).map((m) => ({
+      id: m.id,
+      session_id: m.session_id,
+      role: m.role as 'user' | 'assistant',
+      content: m.content,
+      created_at: m.created_at,
+      is_emergency: m.is_emergency,
       timestamp: m.created_at,
       isUser: m.role === 'user',
     }));
   },
 
   renameSession: async (sessionId: string, title: string) => {
-    const s = localSessions.find((s) => s.id === sessionId);
-    if (s) s.title = title;
-    return s;
+    const { data, error } = await supabase
+      .from('chat_sessions')
+      .update({ title })
+      .eq('id', sessionId)
+      .select()
+      .single();
+
+    if (error) throw new ApiError(500, error);
+    return data;
   },
 
   deleteSession: async (sessionId: string) => {
-    const idx = localSessions.findIndex((s) => s.id === sessionId);
-    if (idx >= 0) localSessions.splice(idx, 1);
-    delete localMessages[sessionId];
+    const { error } = await supabase
+      .from('chat_sessions')
+      .delete()
+      .eq('id', sessionId);
+
+    if (error) throw new ApiError(500, error);
     return null;
   },
 
   deleteAllSessions: async () => {
-    localSessions.length = 0;
-    Object.keys(localMessages).forEach((k) => delete localMessages[k]);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new ApiError(401, { message: 'Not authenticated' });
+
+    const { error } = await supabase
+      .from('chat_sessions')
+      .delete()
+      .eq('user_id', user.id);
+
+    if (error) throw new ApiError(500, error);
     return null;
   },
 
-  // SSE streaming via Edge Function (uses service role, no user auth needed)
   sendMessageStream: async (params: {
     sessionId: string | null;
     message: string;
-    model_tier: string;
+    model_tier?: ModelTier;
     signal?: AbortSignal;
-  }) => {
-    // Save user message locally
-    let sessionId = params.sessionId;
-    if (!sessionId) {
-      const session = await chatApi.createSession(params.message.slice(0, 50));
-      sessionId = session.id;
-    }
-    if (!localMessages[sessionId]) localMessages[sessionId] = [];
-    localMessages[sessionId].push({
-      id: crypto.randomUUID(),
-      role: 'user',
-      content: params.message,
-      created_at: new Date().toISOString(),
-    });
+  }): Promise<Response> => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new ApiError(401, { message: 'Not authenticated' });
 
-    // Build conversation history (last 10 turns for cost optimization)
-    const history = (localMessages[sessionId] || []).slice(-20);
-    const messages = [
-      { role: 'system' as const, content: SYSTEM_PROMPT },
-      ...history.map((m) => ({
-        role: m.role as 'user' | 'assistant',
-        content: m.content,
-      })),
-    ];
-
-    // Call xAI/Grok API directly
-    const response = await fetch('https://api.x.ai/v1/chat/completions', {
+    const response = await fetch(EDGE_CHAT_URL, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${XAI_API_KEY}`,
+        'Authorization': `Bearer ${session.access_token}`,
         'Content-Type': 'application/json',
       },
       signal: params.signal,
       body: JSON.stringify({
-        model: 'grok-4-1-fast-reasoning',
-        messages,
-        stream: true,
-        temperature: 0.3,
-        max_tokens: 3000,
+        session_id: params.sessionId,
+        message: params.message,
+        model_tier: params.model_tier || 'reasoning',
       }),
     });
 
     if (!response.ok) {
-      const err = await response.text().catch(() => '');
-      throw new ApiError(response.status, { error: err || 'AI service error' });
+      const err = await response.json().catch(() => ({ error: 'Unknown error' }));
+      throw new ApiError(response.status, err);
     }
 
-    // Wrap response to also save assistant message when done
-    const originalBody = response.body!;
-    const reader = originalBody.getReader();
-    const decoder = new TextDecoder();
-    const encoder = new TextEncoder();
-    let fullContent = '';
-
-    const wrappedStream = new ReadableStream({
-      async start(controller) {
-        controller.enqueue(encoder.encode(`: connected\n\n`));
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ session_id: sessionId })}\n\n`));
-
-        let buffer = '';
-        try {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            buffer += decoder.decode(value, { stream: true });
-            const lines = buffer.split('\n');
-            buffer = lines.pop() || '';
-
-            for (const line of lines) {
-              if (!line.startsWith('data: ')) continue;
-              const data = line.slice(6).trim();
-              if (data === '[DONE]') continue;
-
-              try {
-                const parsed = JSON.parse(data);
-                const content = parsed.choices?.[0]?.delta?.content;
-                if (content) {
-                  fullContent += content;
-                  controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`));
-                }
-              } catch { /* skip */ }
-            }
-          }
-
-          // Save assistant message
-          if (sessionId && fullContent) {
-            if (!localMessages[sessionId]) localMessages[sessionId] = [];
-            localMessages[sessionId].push({
-              id: crypto.randomUUID(),
-              role: 'assistant',
-              content: fullContent,
-              created_at: new Date().toISOString(),
-            });
-          }
-
-          controller.enqueue(encoder.encode('data: [DONE]\n\n'));
-          controller.close();
-        } catch (err) {
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: 'Stream interrupted' })}\n\n`));
-          controller.close();
-        }
-      },
-    });
-
-    return new Response(wrappedStream, {
-      headers: { 'Content-Type': 'text/event-stream' },
-    });
+    return response;
   },
 
   sendMessage: async (params: {
     message: string;
-    model_tier?: string;
-  }): Promise<{ content: string }> => {
+    sessionId?: string | null;
+    model_tier?: ModelTier;
+  }): Promise<{ content: string; session_id: string; emergency: boolean }> => {
     const response = await chatApi.sendMessageStream({
-      sessionId: null,
+      sessionId: params.sessionId ?? null,
       message: params.message,
-      model_tier: params.model_tier || 'standard',
+      model_tier: params.model_tier,
     });
 
-    if (!response?.body) throw new Error('No response body');
-
-    const reader = response.body.getReader();
+    const reader = response.body!.getReader();
     const decoder = new TextDecoder();
     let fullContent = '';
+    let sessionId = '';
+    let emergency = false;
+    let buffer = '';
 
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-      const chunk = decoder.decode(value);
-      for (const line of chunk.split('\n')) {
-        if (line.startsWith('data: ') && line !== 'data: [DONE]') {
-          try {
-            const data = JSON.parse(line.slice(6));
-            if (data.content) fullContent += data.content;
-          } catch { /* skip */ }
-        }
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const data = line.slice(6).trim();
+        if (data === '[DONE]') continue;
+
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.content) fullContent += parsed.content;
+          if (parsed.session_id) sessionId = parsed.session_id;
+          if (parsed.emergency) emergency = true;
+        } catch { /* skip */ }
       }
     }
-    return { content: fullContent };
+
+    return { content: fullContent, session_id: sessionId, emergency };
   },
 
   shareSession: async (_sessionId: string) => ({ share_token: '', url: '' }),
   revokeShare: async (_sessionId: string) => null,
 };
 
-/**
- * Payment API (stubs — free for now)
- */
+// ═══════════════════════════════════════════════════════════════════════════
+// Payment / Quota API
+// ═══════════════════════════════════════════════════════════════════════════
 export const paymentApi = {
   getSubscriptionStatus: async () => ({
     status: 'free',
@@ -340,20 +298,19 @@ export const paymentApi = {
   }),
 };
 
-/**
- * Contact API
- */
+// ═══════════════════════════════════════════════════════════════════════════
+// Contact API
+// ═══════════════════════════════════════════════════════════════════════════
 export const contactApi = {
   submit: async (data: { name?: string; email: string; subject?: string; message: string }) => {
-    // Could be an Edge Function later
     console.log('Contact form submitted:', data);
     return { success: true };
   },
 };
 
-/**
- * Documents API (stub)
- */
+// ═══════════════════════════════════════════════════════════════════════════
+// Stubs
+// ═══════════════════════════════════════════════════════════════════════════
 export const documentsApi = {
   listDocuments: async () => [],
   getDocument: async (_id: string) => null,
@@ -363,9 +320,6 @@ export const documentsApi = {
   downloadDocument: async (_id: string, _title: string, _format: string) => null,
 };
 
-/**
- * Countries API (stub)
- */
 export interface Country {
   code: string;
   name: string;
@@ -392,21 +346,14 @@ export const countriesApi = {
   }),
 };
 
-/**
- * Search API (stub)
- */
 export const searchApi = {
   search: async (_query: string) => ({ results: [] }),
 };
 
-/**
- * Public Search API (stub)
- */
 export const publicSearchApi = {
   search: async (_query: string) => ({ results: [] }),
 };
 
-// Re-export helper
 export function getCountryCode(jurisdiction?: string | null): string {
   return jurisdiction || 'GE';
 }
