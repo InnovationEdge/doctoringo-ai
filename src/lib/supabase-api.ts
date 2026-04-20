@@ -162,18 +162,24 @@ const GUEST_SYSTEM_PROMPT = `შენ ხარ **Doctoringo AI** — სამ
 
 export const chatApi = {
   listSessions: async (): Promise<ChatSession[]> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return []; // Guest — no saved sessions
+
     const { data, error } = await supabase
       .from('chat_sessions')
       .select('id, title, created_at, updated_at')
       .order('updated_at', { ascending: false });
 
-    if (error) throw new ApiError(500, error);
+    if (error) return [];
     return data || [];
   },
 
   createSession: async (title: string = 'New Chat'): Promise<ChatSession> => {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new ApiError(401, { message: 'Not authenticated' });
+    if (!user) {
+      // Guest — return local session
+      return { id: crypto.randomUUID(), title, created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+    }
 
     const { data, error } = await supabase
       .from('chat_sessions')
@@ -186,6 +192,9 @@ export const chatApi = {
   },
 
   getSessionHistory: async (sessionId: string): Promise<ChatMessage[]> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return []; // Guest — no history
+
     const { data, error } = await supabase
       .from('chat_messages')
       .select('id, session_id, role, content, created_at, is_emergency')
@@ -193,7 +202,7 @@ export const chatApi = {
       .in('role', ['user', 'assistant'])
       .order('created_at', { ascending: true });
 
-    if (error) throw new ApiError(500, error);
+    if (error) return [];
 
     return (data || []).map((m) => ({
       id: m.id,
@@ -208,6 +217,9 @@ export const chatApi = {
   },
 
   renameSession: async (sessionId: string, title: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { id: sessionId, title, created_at: '', updated_at: '' };
+
     const { data, error } = await supabase
       .from('chat_sessions')
       .update({ title })
@@ -215,30 +227,23 @@ export const chatApi = {
       .select()
       .single();
 
-    if (error) throw new ApiError(500, error);
+    if (error) return { id: sessionId, title, created_at: '', updated_at: '' };
     return data;
   },
 
   deleteSession: async (sessionId: string) => {
-    const { error } = await supabase
-      .from('chat_sessions')
-      .delete()
-      .eq('id', sessionId);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return null;
 
-    if (error) throw new ApiError(500, error);
+    await supabase.from('chat_sessions').delete().eq('id', sessionId);
     return null;
   },
 
   deleteAllSessions: async () => {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new ApiError(401, { message: 'Not authenticated' });
+    if (!user) return null;
 
-    const { error } = await supabase
-      .from('chat_sessions')
-      .delete()
-      .eq('user_id', user.id);
-
-    if (error) throw new ApiError(500, error);
+    await supabase.from('chat_sessions').delete().eq('user_id', user.id);
     return null;
   },
 
