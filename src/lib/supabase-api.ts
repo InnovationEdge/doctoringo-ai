@@ -411,8 +411,7 @@ export const paymentApi = {
 // Contact API
 // ═══════════════════════════════════════════════════════════════════════════
 export const contactApi = {
-  submit: async (data: { name?: string; email: string; subject?: string; message: string }) => {
-    console.log('Contact form submitted:', data);
+  submit: async (_data: { name?: string; email: string; subject?: string; message: string }) => {
     return { success: true };
   },
 };
@@ -421,12 +420,12 @@ export const contactApi = {
 // Stubs
 // ═══════════════════════════════════════════════════════════════════════════
 export const documentsApi = {
-  listDocuments: async () => [],
-  getDocument: async (_id: string) => null,
-  generateDocument: async (_params: any) => null,
-  fillForm: async (_params: any) => null,
-  deleteDocument: async (_id: string) => null,
-  downloadDocument: async (_id: string, _title: string, _format: string) => null,
+  listDocuments: async () => [] as any[],
+  getDocument: async (_id: string) => null as any,
+  generateDocument: async (_params: any) => ({ id: '', file_url: '', title: '', format: '' }) as any,
+  fillForm: async (_params: any) => null as any,
+  deleteDocument: async (_id: string) => null as any,
+  downloadDocument: async (_id: string, _title: string, _format: string) => null as any,
 };
 
 export interface Country {

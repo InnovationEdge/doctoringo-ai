@@ -48,8 +48,8 @@ export function ChatMessage({ message, onRegenerate }: { message: Message; onReg
 
   useEffect(() => {
     const handleFontChange = () => setChatFont(localStorage.getItem('doctoringo_chat_font') || 'Default');
-    window.addEventListener('knowhow-font-change', handleFontChange);
-    return () => window.removeEventListener('knowhow-font-change', handleFontChange);
+    window.addEventListener('doctoringo-font-change', handleFontChange);
+    return () => window.removeEventListener('doctoringo-font-change', handleFontChange);
   }, []);
 
   useEffect(() => {
