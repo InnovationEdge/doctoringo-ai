@@ -281,7 +281,7 @@ export const chatApi = {
 
     // Guest mode → call Grok API directly
     const XAI_KEY = import.meta.env.VITE_XAI_API_KEY || '';
-    if (!XAI_KEY) throw new ApiError(503, { error: 'AI not configured' });
+    if (!XAI_KEY) throw new ApiError(503, { error: 'AI სერვისი დროებით მიუწვდომელია. გთხოვთ სცადოთ მოგვიანებით.' });
 
     // Save to local memory
     if (!guestMessages[params.sessionId || '']) guestMessages[params.sessionId || ''] = [];
@@ -339,8 +339,9 @@ export const chatApi = {
           if (fullContent) msgs.push({ role: 'assistant', content: fullContent });
           controller.enqueue(encoder.encode('data: [DONE]\n\n'));
           controller.close();
-        } catch {
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: 'Stream interrupted' })}\n\n`));
+        } catch (streamError) {
+          const errorMsg = streamError instanceof Error ? streamError.message : 'Stream interrupted';
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: errorMsg })}\n\n`));
           controller.close();
         }
       },

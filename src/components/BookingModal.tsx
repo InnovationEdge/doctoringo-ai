@@ -20,6 +20,7 @@ export function BookingModal({ intent, isOpen, onClose }: BookingModalProps) {
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
 
   const specialtyName = SPECIALTY_NAMES[intent.specialty] || intent.specialty;
   const urgencyInfo = URGENCY_NAMES[intent.urgency] || { label: intent.urgency, color: '#6B7280' };
@@ -32,7 +33,7 @@ export function BookingModal({ intent, isOpen, onClose }: BookingModalProps) {
     try {
       const { data: { user } } = await supabase.auth.getUser();
 
-      await supabase.from('appointments').insert({
+      const { error: insertError } = await supabase.from('appointments').insert({
         user_id: user?.id || null,
         specialty: intent.specialty,
         urgency: intent.urgency,
@@ -44,6 +45,8 @@ export function BookingModal({ intent, isOpen, onClose }: BookingModalProps) {
         status: 'pending',
       });
 
+      if (insertError) throw insertError;
+
       setSuccess(true);
       setTimeout(() => {
         onClose();
@@ -54,7 +57,7 @@ export function BookingModal({ intent, isOpen, onClose }: BookingModalProps) {
         setNotes('');
       }, 2000);
     } catch (err) {
-      console.error('Booking error:', err);
+      setError('ჩაწერა ვერ მოხერხდა. გთხოვთ სცადოთ ხელახლა.');
     } finally {
       setSubmitting(false);
     }
@@ -112,6 +115,11 @@ export function BookingModal({ intent, isOpen, onClose }: BookingModalProps) {
               </motion.div>
             ) : (
               <form onSubmit={handleSubmit} className="p-5 space-y-4">
+                {error && (
+                  <div className="p-3 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-[13px]">
+                    {error}
+                  </div>
+                )}
                 {/* Specialty + Urgency info */}
                 <div className="p-3 rounded-xl bg-[#f3f3f3] dark:bg-[#2a2a2a]">
                   <div className="text-[14px] font-medium text-[#1a1a1a] dark:text-white">
