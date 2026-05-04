@@ -8,7 +8,23 @@ import { supabase } from '../supabase';
 import { ApiError, ChatSession, ChatMessage, ModelTier } from './types';
 import { getSystemPrompt } from './prompts';
 
-const EDGE_CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
+const SUPABASE_BASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
+const EDGE_CHAT_URL = `${SUPABASE_BASE_URL}/functions/v1/chat`;
+const EDGE_SEARCH_URL = `${SUPABASE_BASE_URL}/functions/v1/search`;
+const EDGE_SHARE_URL = `${SUPABASE_BASE_URL}/functions/v1/share`;
+const EDGE_UPLOAD_URL = `${SUPABASE_BASE_URL}/functions/v1/upload`;
+
+async function authedFetch(url: string, init: RequestInit): Promise<Response> {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new ApiError(401, { error: 'Sign in required' });
+  return fetch(url, {
+    ...init,
+    headers: {
+      ...(init.headers || {}),
+      Authorization: `Bearer ${session.access_token}`,
+    },
+  });
+}
 
 // Guest mode — in-memory conversation storage
 const guestMessages: Record<string, { role: string; content: string }[]> = {};
@@ -191,18 +207,35 @@ export const chatApi = {
   },
 
   shareSession: async (
-    _sessionId: string,
-  ): Promise<{ success: boolean; share_token?: string; share_url?: string; error?: string }> => ({
-    success: false,
-    share_token: '',
-    share_url: '',
-    error: 'Sharing is not yet enabled.',
-  }),
+    sessionId: string,
+  ): Promise<{ success: boolean; share_token?: string; share_url?: string; error?: string }> => {
+    try {
+      const res = await authedFetch(EDGE_SHARE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'create', session_id: sessionId }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) return { success: false, error: data?.error || 'Share failed' };
+      return data;
+    } catch (e) {
+      return { success: false, error: e instanceof Error ? e.message : 'Share failed' };
+    }
+  },
 
-  revokeShare: async (_sessionId: string): Promise<null> => null,
+  revokeShare: async (sessionId: string): Promise<null> => {
+    try {
+      await authedFetch(EDGE_SHARE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'revoke', session_id: sessionId }),
+      });
+    } catch { /* ignore */ }
+    return null;
+  },
 
   getSharedSession: async (
-    _shareToken: string,
+    shareToken: string,
   ): Promise<{
     success: boolean;
     id: string;
@@ -216,32 +249,65 @@ export const chatApi = {
     }>;
     session?: ChatSession;
     error?: string;
-  }> => ({
-    success: false,
-    id: '',
-    title: '',
-    created_at: '',
-    messages: [],
-    error: 'Shared session not found.',
-  }),
+  }> => {
+    const empty = {
+      success: false,
+      id: '',
+      title: '',
+      created_at: '',
+      messages: [] as Array<{ id: string; role: 'user' | 'assistant'; content: string; created_at: string }>,
+    };
+    if (!SUPABASE_BASE_URL) return { ...empty, error: 'Backend not configured' };
+    try {
+      const res = await fetch(
+        `${EDGE_SHARE_URL}?token=${encodeURIComponent(shareToken)}`,
+        { method: 'GET' },
+      );
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) return { ...empty, error: data?.error || 'Not found' };
+      return data;
+    } catch (e) {
+      return { ...empty, error: e instanceof Error ? e.message : 'Network error' };
+    }
+  },
 
   uploadFile: async (
-    _file: File,
-    _sessionId?: string,
+    file: File,
+    sessionId?: string,
   ): Promise<{
     success: boolean;
     file?: { id: string; name: string; url: string; type: string; size: number };
     error?: string;
-  }> => ({
-    success: false,
-    error: 'File upload is not yet enabled.',
-  }),
+  }> => {
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      if (sessionId) form.append('session_id', sessionId);
+      const res = await authedFetch(EDGE_UPLOAD_URL, { method: 'POST', body: form });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) return { success: false, error: data?.error || 'Upload failed' };
+      return data;
+    } catch (e) {
+      return { success: false, error: e instanceof Error ? e.message : 'Upload failed' };
+    }
+  },
 
   searchChats: async (
-    _query: string,
-  ): Promise<{ results: Array<{ id: string; title: string; snippet?: string }>; error?: string }> => ({
-    results: [],
-  }),
+    query: string,
+  ): Promise<{ results: Array<{ id: string; title: string; snippet?: string }>; error?: string }> => {
+    try {
+      const res = await authedFetch(EDGE_SEARCH_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) return { results: [], error: data?.error || 'Search failed' };
+      return data;
+    } catch (e) {
+      return { results: [], error: e instanceof Error ? e.message : 'Search failed' };
+    }
+  },
 
   getUsageStats: async (): Promise<{
     success: boolean;

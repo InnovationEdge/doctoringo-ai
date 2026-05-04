@@ -37,3 +37,7 @@ coverage
 *.tsbuildinfo
 .temp_cache/
 .vercel
+
+# Supabase CLI local state
+supabase/.temp/
+supabase/.branches/

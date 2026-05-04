@@ -6,6 +6,7 @@
  * graceful empty/loading states.
  */
 import { CountriesResponse } from './types';
+import { chatApi } from './chat';
 
 export interface SubscriptionStatus {
   status: 'free' | 'pro' | 'premium';
@@ -169,8 +170,19 @@ export interface SearchResponse {
 }
 
 export const searchApi = {
-  search: async (_query: string): Promise<SearchResponse> => ({ results: [] }),
-  searchChats: async (_query: string): Promise<SearchResponse> => ({ results: [] }),
+  search: async (query: string): Promise<SearchResponse> => searchApi.searchChats(query),
+  searchChats: async (query: string): Promise<SearchResponse> => {
+    const data = await chatApi.searchChats(query);
+    return {
+      results: (data.results || []).map((r) => ({
+        id: r.id,
+        title: r.title,
+        snippet: r.snippet,
+        type: 'chat',
+      })),
+      error: data.error,
+    };
+  },
 };
 
 export const publicSearchApi = {
