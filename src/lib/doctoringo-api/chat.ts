@@ -6,7 +6,7 @@
  */
 import { supabase } from '../supabase';
 import { ApiError, ChatSession, ChatMessage, ModelTier } from './types';
-import { SYSTEM_PROMPT } from './prompts';
+import { getSystemPrompt } from './prompts';
 
 const EDGE_CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 
@@ -108,6 +108,8 @@ export const chatApi = {
     sessionId: string | null;
     message: string;
     model_tier?: ModelTier;
+    mode?: string;
+    country_code?: string;
     signal?: AbortSignal;
   }): Promise<Response> => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -125,6 +127,8 @@ export const chatApi = {
           session_id: params.sessionId,
           message: params.message,
           model_tier: params.model_tier || 'reasoning',
+          mode: params.mode || 'chat',
+          country_code: params.country_code,
         }),
       });
 
@@ -143,11 +147,15 @@ export const chatApi = {
     message: string;
     sessionId?: string | null;
     model_tier?: ModelTier;
+    country_code?: string;
+    mode?: string;
   }): Promise<{ content: string; session_id: string; emergency: boolean }> => {
     const response = await chatApi.sendMessageStream({
       sessionId: params.sessionId ?? null,
       message: params.message,
       model_tier: params.model_tier,
+      mode: params.mode,
+      country_code: params.country_code,
     });
 
     const reader = response.body!.getReader();
@@ -182,8 +190,85 @@ export const chatApi = {
     return { content: fullContent, session_id: sessionId, emergency };
   },
 
-  shareSession: async (_sessionId: string) => ({ share_token: '', url: '' }),
-  revokeShare: async (_sessionId: string) => null,
+  shareSession: async (
+    _sessionId: string,
+  ): Promise<{ success: boolean; share_token?: string; share_url?: string; error?: string }> => ({
+    success: false,
+    share_token: '',
+    share_url: '',
+    error: 'Sharing is not yet enabled.',
+  }),
+
+  revokeShare: async (_sessionId: string): Promise<null> => null,
+
+  getSharedSession: async (
+    _shareToken: string,
+  ): Promise<{
+    success: boolean;
+    id: string;
+    title: string;
+    created_at: string;
+    messages: Array<{
+      id: string;
+      role: 'user' | 'assistant';
+      content: string;
+      created_at: string;
+    }>;
+    session?: ChatSession;
+    error?: string;
+  }> => ({
+    success: false,
+    id: '',
+    title: '',
+    created_at: '',
+    messages: [],
+    error: 'Shared session not found.',
+  }),
+
+  uploadFile: async (
+    _file: File,
+    _sessionId?: string,
+  ): Promise<{
+    success: boolean;
+    file?: { id: string; name: string; url: string; type: string; size: number };
+    error?: string;
+  }> => ({
+    success: false,
+    error: 'File upload is not yet enabled.',
+  }),
+
+  searchChats: async (
+    _query: string,
+  ): Promise<{ results: Array<{ id: string; title: string; snippet?: string }>; error?: string }> => ({
+    results: [],
+  }),
+
+  getUsageStats: async (): Promise<{
+    success: boolean;
+    usage?: {
+      messages_sent: number;
+      sessions_created: number;
+      tokens_used: number;
+    };
+    error?: string;
+  }> => ({
+    success: false,
+    error: 'Usage stats not yet enabled.',
+  }),
+
+  getAnalytics: async (
+    _days: number,
+  ): Promise<{
+    success: boolean;
+    analytics?: {
+      messages_per_day: Array<{ date: string; count: number }>;
+      top_topics: Array<{ topic: string; count: number }>;
+    };
+    error?: string;
+  }> => ({
+    success: false,
+    error: 'Analytics not yet enabled.',
+  }),
 };
 
 // ─── Guest Chat Helper ───────────────────────────────────────────────────────
@@ -192,6 +277,7 @@ async function streamGuestChat(params: {
   sessionId: string | null;
   message: string;
   model_tier?: ModelTier;
+  mode?: string;
   signal?: AbortSignal;
 }): Promise<Response> {
   const XAI_KEY = import.meta.env.VITE_XAI_API_KEY || '';
@@ -205,7 +291,7 @@ async function streamGuestChat(params: {
   msgs.push({ role: 'user', content: params.message });
 
   const apiMessages = [
-    { role: 'system' as const, content: SYSTEM_PROMPT },
+    { role: 'system' as const, content: getSystemPrompt(params.mode) },
     ...msgs.slice(-20),
   ];
 

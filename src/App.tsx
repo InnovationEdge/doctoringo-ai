@@ -211,9 +211,7 @@ function AppContent() {
   const loadChats = async () => {
     try {
       const response = await chatApi.listSessions();
-      if (response) {
-        setChats(Array.isArray(response) ? response : response.results || []);
-      }
+      setChats(Array.isArray(response) ? response : []);
     } catch (error) {
       console.error('Failed to load chats');
     }

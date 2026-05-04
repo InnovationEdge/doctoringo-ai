@@ -74,9 +74,19 @@ export const authApi = {
     return { user, sessions };
   },
 
-  deleteAccount: async (): Promise<void> => {
+  deleteAccount: async (_confirmation?: string): Promise<void> => {
     await supabase.auth.signOut();
   },
 
-  getActiveSessions: async (): Promise<never[]> => [],
+  getActiveSessions: async (): Promise<{
+    sessions: Array<{
+      id: string;
+      device?: string;
+      location?: string;
+      last_active?: string;
+      current?: boolean;
+    }>;
+  }> => ({
+    sessions: [],
+  }),
 };

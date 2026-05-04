@@ -304,7 +304,7 @@ export function SettingsModal({ isOpen, onClose, initialTab = 'General', user }:
       paymentApi.getPaymentHistory().catch(() => [])
     ]).then(([subData, historyData]) => {
       setSubscription(subData);
-      setPaymentHistory(Array.isArray(historyData) ? historyData : historyData?.results || []);
+      setPaymentHistory(Array.isArray(historyData) ? historyData : []);
     }).finally(() => setBillingLoading(false));
   };
 

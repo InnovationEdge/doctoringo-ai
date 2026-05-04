@@ -567,7 +567,7 @@ export function LegalDocumentsPage({ onOpenMobileMenu, language = 'EN', user, on
     try {
       setLoading(true);
       const data = await documentsApi.listDocuments();
-      setDocs(Array.isArray(data) ? data : (data.results || []));
+      setDocs(Array.isArray(data) ? data : []);
     } catch (e) {
       console.error('Failed to fetch documents:', e);
     } finally {
