@@ -38,16 +38,20 @@ class ErrorBoundaryClass extends Component<Props, State> {
     }
 
     // Send to error tracking service in production
-    // To enable: set VITE_SENTRY_DSN environment variable and install @sentry/react
+    // To enable: set VITE_SENTRY_DSN environment variable and install @sentry/react.
+    // Dynamic import is wrapped in vite-ignore so the bundler doesn't fail when
+    // the package is absent from devDependencies.
     if (import.meta.env.PROD && import.meta.env.VITE_SENTRY_DSN) {
-      // Dynamic import to avoid bundling Sentry if not used
-      import('@sentry/react').then(Sentry => {
-        Sentry.captureException(error, {
-          extra: { componentStack: errorInfo.componentStack }
+      const sentryModuleName = '@sentry/react'
+      import(/* @vite-ignore */ sentryModuleName)
+        .then((Sentry: { captureException: (e: unknown, ctx?: unknown) => void }) => {
+          Sentry.captureException(error, {
+            extra: { componentStack: errorInfo.componentStack },
+          })
         })
-      }).catch(() => {
-        // Sentry not installed, silently ignore
-      })
+        .catch(() => {
+          /* Sentry not installed, silently ignore */
+        })
     }
 
     this.setState({

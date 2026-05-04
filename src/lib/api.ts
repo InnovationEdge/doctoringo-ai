@@ -1,8 +1,7 @@
 /**
  * Doctoringo AI - API Integration Library
- * Backed by Supabase (Auth + Database + Edge Functions)
+ * Re-exports from modular doctoringo-api/ directory
  */
-
 export {
   authApi,
   chatApi,
@@ -14,9 +13,9 @@ export {
   publicSearchApi,
   getCountryCode,
   ApiError,
-} from './supabase-api';
+} from './doctoringo-api/index';
 
-export type { Country, CountriesResponse } from './supabase-api';
+export type { Country, CountriesResponse } from './doctoringo-api/index';
 
 export const API_BASE_URL =
   import.meta.env.VITE_SUPABASE_URL ||

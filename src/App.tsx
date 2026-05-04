@@ -5,6 +5,7 @@ import { ChatArea } from './components/ChatArea';
 import { ChatsPage } from './components/ChatsPage';
 import { AuthGuard, PublicRoute } from './components/AuthGuard';
 import { authApi, chatApi, paymentApi } from './lib/api';
+import { supabase } from './lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
 import { ThemeProvider } from './components/ThemeContext';
 import { useTranslation } from './providers/TranslationProvider';
@@ -26,6 +27,8 @@ const TermsPage = lazy(() => import('./components/legal/TermsPage').then(m => ({
 const PrivacyPolicyPage = lazy(() => import('./components/legal/PrivacyPolicyPage').then(m => ({ default: m.PrivacyPolicyPage })));
 const DisclaimerPage = lazy(() => import('./components/legal/DisclaimerPage').then(m => ({ default: m.DisclaimerPage })));
 const DPAPage = lazy(() => import('./components/legal/DPAPage').then(m => ({ default: m.DPAPage })));
+
+const BookingModalLazy = lazy(() => import('./components/BookingModal').then(m => ({ default: m.BookingModal })));
 
 const Motion = motion;
 
@@ -88,26 +91,52 @@ function AppContent() {
   const [settingsTab, setSettingsTab] = useState('General');
   const [showPlans, setShowPlans] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const [bookingIntent, setBookingIntent] = useState<any>(null);
 
-  // Initialize app — no auth required, everyone can use the chat
+  // Initialize — allow everyone in, check auth in background
   useEffect(() => {
     const initializeAuth = async () => {
-      setIsAuthenticated(true);
-      setUser({ id: 'guest', email: '', first_name: '', last_name: '' });
-      setIsLoading(false);
+      try {
+        const userData = await authApi.getCurrentUser();
+        if (userData && userData.id) {
+          setUser(userData);
+          setIsAuthenticated(true);
+        } else {
+          // Guest mode — still allow access
+          setUser({ id: 'guest', email: '', first_name: '', last_name: '' });
+          setIsAuthenticated(true);
+        }
+      } catch {
+        // Guest mode
+        setUser({ id: 'guest', email: '', first_name: '', last_name: '' });
+        setIsAuthenticated(true);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     initializeAuth();
 
-    // Listen for session expiry - only update state, let AuthGuard handle routing
+    // Listen for Supabase auth state changes (OAuth callback)
+    const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        const userData = await authApi.getCurrentUser();
+        if (userData) {
+          setUser(userData);
+          setIsAuthenticated(true);
+          navigate('/app', { replace: true });
+        }
+      }
+    });
+
     const handleSessionExpired = () => {
-      setIsAuthenticated(false);
-      setUser(null);
-      setCurrentChatId(null);
-      setCurrentChatTitle(null);
-      setChats([]);
-      localStorage.removeItem('doctoringo_user');
-      // Don't navigate here - AuthGuard will redirect to '/' when isAuthenticated becomes false
+      // Stay in guest mode instead of locking out
+      setUser({ id: 'guest', email: '', first_name: '', last_name: '' });
+      setIsAuthenticated(true);
+    };
+
+    const handleBookAppointment = (e: CustomEvent) => {
+      setBookingIntent(e.detail);
     };
 
     const handleNewChatStarted = () => {
@@ -158,6 +187,7 @@ function AppContent() {
 
     window.addEventListener('payment-success', handlePaymentSuccess);
     window.addEventListener('open-plans', handleOpenPlans);
+    window.addEventListener('book-appointment', handleBookAppointment as EventListener);
 
     return () => {
       window.removeEventListener('session-expired', handleSessionExpired);
@@ -166,6 +196,7 @@ function AppContent() {
       window.removeEventListener('refresh-sessions', handleRefreshSessions);
       window.removeEventListener('chats-deleted', handleChatsDeleted);
       window.removeEventListener('profile-updated', handleProfileUpdated as EventListener);
+      window.removeEventListener('book-appointment', handleBookAppointment as EventListener);
       window.removeEventListener('payment-success', handlePaymentSuccess);
       window.removeEventListener('open-plans', handleOpenPlans);
     };
@@ -180,9 +211,7 @@ function AppContent() {
   const loadChats = async () => {
     try {
       const response = await chatApi.listSessions();
-      if (response) {
-        setChats(Array.isArray(response) ? response : response.results || []);
-      }
+      setChats(Array.isArray(response) ? response : []);
     } catch (error) {
       console.error('Failed to load chats');
     }
@@ -422,6 +451,13 @@ function AppContent() {
             language={plansLanguage}
           />
         )}
+        {bookingIntent && (
+          <BookingModalLazy
+            intent={bookingIntent}
+            isOpen={!!bookingIntent}
+            onClose={() => setBookingIntent(null)}
+          />
+        )}
       </Suspense>
     </Motion.div>
   );
@@ -453,7 +489,7 @@ function AppContent() {
           }
         />
 
-        {/* Main app route - direct access, no auth */}
+        {/* Main app route - login required */}
         <Route
           path="/app"
           element={
@@ -461,8 +497,10 @@ function AppContent() {
               <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#171717]">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white" />
               </div>
-            ) : (
+            ) : isAuthenticated ? (
               dashboardLayout
+            ) : (
+              <DoctorinoLoginPage onLogin={handleLogin} />
             )
           }
         />

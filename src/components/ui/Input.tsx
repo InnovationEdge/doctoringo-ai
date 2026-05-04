@@ -104,14 +104,14 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(({
   ...props
 }, ref) => {
   const [height, setHeight] = useState<number | undefined>()
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 
-  const combinedRef = (node: HTMLTextAreaElement) => {
+  const combinedRef = (node: HTMLTextAreaElement | null) => {
     textareaRef.current = node
     if (typeof ref === 'function') {
       ref(node)
     } else if (ref) {
-      ref.current = node
+      (ref as React.MutableRefObject<HTMLTextAreaElement | null>).current = node
     }
   }
 

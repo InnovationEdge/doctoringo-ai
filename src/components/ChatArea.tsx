@@ -385,11 +385,9 @@ export function ChatArea({
 
       abortControllerRef.current = new AbortController();
       const response = await chatApi.sendMessageStream({
-        sessionId: sessionId || 'incognito',
+        sessionId: sessionId || null,
         message: sentContent,
         model_tier: selectedModel.id as any,
-        country_code: getCountryCode(user?.jurisdiction),
-        file_id: fileId || undefined,
         signal: abortControllerRef.current.signal,
       });
 
@@ -539,7 +537,9 @@ export function ChatArea({
         if (error?.status === 503) {
           errorMessage = translate('error_ai_unavailable', 'AI service is temporarily unavailable. Please try again later.');
         } else if (error?.status === 401 || error?.status === 403) {
-          errorMessage = translate('error_session_expired', 'Session expired. Please refresh the page and log in again.');
+          errorMessage = user?.id === 'guest'
+            ? translate('error_try_again', 'Something went wrong. Please try again.')
+            : translate('error_session_expired', 'Session expired. Please refresh the page and log in again.');
         } else if (error?.message) {
           errorMessage = error.message;
         } else if (error?.data?.error) {

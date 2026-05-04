@@ -93,7 +93,16 @@ export function MatsnePage() {
         setError(data.error);
         setResults([]);
       } else {
-        setResults(data.results || []);
+        const normalized: SearchResult[] = (data.results || []).map((r) => ({
+          title: r.title || '',
+          snippet: r.snippet || '',
+          url: r.url || '',
+          article: r.article ?? null,
+          article_title: r.article_title || '',
+          score: r.score ?? 0,
+          document_type: r.document_type || '',
+        }));
+        setResults(normalized);
       }
     } catch {
       setError('ძიება ვერ მოხერხდა. გთხოვთ სცადოთ ხელახლა.');

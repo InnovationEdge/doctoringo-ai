@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Copy, ThumbsUp, ThumbsDown, RotateCcw, ChevronDown, Check, FileText, ChevronUp, Download } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'motion/react';
 import { DoctorLogo } from './DoctorLogo';
+import { BookingCard } from './BookingCard';
+import { parseBookingIntent } from '../lib/booking';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useTranslation } from 'src/providers/TranslationProvider';
@@ -46,8 +48,8 @@ export function ChatMessage({ message, onRegenerate }: { message: Message; onReg
 
   useEffect(() => {
     const handleFontChange = () => setChatFont(localStorage.getItem('doctoringo_chat_font') || 'Default');
-    window.addEventListener('knowhow-font-change', handleFontChange);
-    return () => window.removeEventListener('knowhow-font-change', handleFontChange);
+    window.addEventListener('doctoringo-font-change', handleFontChange);
+    return () => window.removeEventListener('doctoringo-font-change', handleFontChange);
   }, []);
 
   useEffect(() => {
@@ -304,8 +306,22 @@ export function ChatMessage({ message, onRegenerate }: { message: Message; onReg
                   ),
                 }}
               >
-                {message.content}
+                {(() => {
+                  const { cleanText } = parseBookingIntent(message.content);
+                  return cleanText;
+                })()}
               </ReactMarkdown>
+              {/* Booking Card — appears when AI recommends a doctor visit */}
+              {!message.isStreaming && (() => {
+                const { intent } = parseBookingIntent(message.content);
+                if (!intent) return null;
+                return (
+                  <BookingCard
+                    intent={intent}
+                    onBook={(i) => window.dispatchEvent(new CustomEvent('book-appointment', { detail: i }))}
+                  />
+                );
+              })()}
               {message.isStreaming && (
                 <Motion.span
                   initial={{ opacity: 0 }}

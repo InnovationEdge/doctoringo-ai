@@ -38,7 +38,20 @@ export function SharedChatView() {
     const fetchSharedSession = async () => {
       try {
         const data = await chatApi.getSharedSession(token);
-        setSession(data.session || data);
+        if (!data?.success) {
+          throw Object.assign(new Error(data?.error || 'Not found'), { status: 404 });
+        }
+        setSession({
+          id: data.id,
+          title: data.title,
+          created_at: data.created_at,
+          messages: data.messages.map((m) => ({
+            id: m.id,
+            role: m.role,
+            content: m.content,
+            created_at: m.created_at,
+          })) as unknown as SharedSession['messages'],
+        });
       } catch (err: any) {
         if (err?.status === 404) {
           setError(translate('shared_no_longer_exists', 'This shared chat no longer exists or has been revoked.'));
