@@ -93,29 +93,51 @@ values (
 on conflict (id) do nothing;
 
 -- Each user gets a folder named after their auth.uid().
-create policy if not exists "Users upload to own folder"
-  on storage.objects for insert
-  to authenticated
-  with check (
-    bucket_id = 'chat-uploads'
-    and (storage.foldername(name))[1] = auth.uid()::text
-  );
+-- Postgres has no CREATE POLICY IF NOT EXISTS, so wrap in DO blocks.
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'storage' and tablename = 'objects'
+      and policyname = 'Users upload to own folder'
+  ) then
+    create policy "Users upload to own folder"
+      on storage.objects for insert
+      to authenticated
+      with check (
+        bucket_id = 'chat-uploads'
+        and (storage.foldername(name))[1] = auth.uid()::text
+      );
+  end if;
 
-create policy if not exists "Users read own files"
-  on storage.objects for select
-  to authenticated
-  using (
-    bucket_id = 'chat-uploads'
-    and (storage.foldername(name))[1] = auth.uid()::text
-  );
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'storage' and tablename = 'objects'
+      and policyname = 'Users read own files'
+  ) then
+    create policy "Users read own files"
+      on storage.objects for select
+      to authenticated
+      using (
+        bucket_id = 'chat-uploads'
+        and (storage.foldername(name))[1] = auth.uid()::text
+      );
+  end if;
 
-create policy if not exists "Users delete own files"
-  on storage.objects for delete
-  to authenticated
-  using (
-    bucket_id = 'chat-uploads'
-    and (storage.foldername(name))[1] = auth.uid()::text
-  );
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'storage' and tablename = 'objects'
+      and policyname = 'Users delete own files'
+  ) then
+    create policy "Users delete own files"
+      on storage.objects for delete
+      to authenticated
+      using (
+        bucket_id = 'chat-uploads'
+        and (storage.foldername(name))[1] = auth.uid()::text
+      );
+  end if;
+end $$;
 
 -- ============================================
 -- 6. Search RPC — used by /functions/v1/search
